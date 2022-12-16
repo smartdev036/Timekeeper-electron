@@ -1,0 +1,111 @@
+$app-background: #f2f6ff;
+.App {
+    flex-direction: row !important;
+    height: 100vh;
+    background-color: $app-background;
+}
+.Main {
+    height: 100vh;
+    overflow: auto;
+    width: auto !important;
+    flex: 1;
+    padding: 10px 20px;
+    position: relative;
+}
+.InnerContainer {
+    margin: 0 !important;
+    flex: 1;
+    overflow: auto;
+}
+
+$side-background: #c5d3f8;
+$side-color: #3a59ae;
+
+.Side {
+    width: 13% !important;
+    max-width: 300px;
+    min-width: 110px !important;
+    background-color: $side-background;
+    color: $side-color;
+    border-radius: 20px 0 0 0;
+    padding: 10px 0;
+    margin-left: 10px !important;
+}
+.SideHeader {
+    padding: 5px 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+
+}
+.SideInner > *:empty {
+    cursor: default;
+    padding: 6px 15px;
+}
+.RouterLink {
+    cursor: pointer;
+    line-height: 1;
+    padding: 6px 15px;
+    padding-left: 13px;
+    position: relative;
+    font-weight: 400;
+    text-transform: capitalize;
+    color: inherit;
+    text-decoration: none;
+    &:hover {
+        font-weight: 600;
+    }
+    &.active {
+        font-weight: 600;
+        cursor: default;
+        &::before {
+            $size: 6px;
+            content: "";
+            width: $size;
+            height: $size;
+            background-color: $side-color;
+            border-radius: 100px;
+            position: absolute;
+            left: -5px;
+            z-index: 1;
+            top: calc(50% - ($size / 2));
+        }
+        &::after {
+            $height: 24px;
+            $width: 14px;
+            background: #f2f6ff;
+            width: $width;
+            height: $height;
+            content: "";
+            position: absolute;
+            left: -9px;
+            border-radius: 0 50px 50px 0;
+            top: calc(50% - ($height / 2));
+        }
+    }
+    &:empty {
+        cursor: default;
+    }
+}
+
+.Header {
+    position: relative;
+    margin-bottom: 10px !important;
+}
+
+.Logo {
+    position: absolute;
+    height: 34px;
+    top: calc(50% - 16px);
+}
+.Time {
+    font-size: 1.8em;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+        margin-right: 7px;
+        transform: translateY(1.5px);
+    }
+}

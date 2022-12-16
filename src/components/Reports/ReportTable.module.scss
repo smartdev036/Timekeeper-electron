@@ -1,0 +1,80 @@
+@use "../../App.module.scss" as App;
+
+
+.Container {
+    margin-top: 10px;
+    font-size: .7em;
+}
+
+.Table {
+    background-color: App.$app-background;
+}
+
+.Sticky {
+    position: sticky;
+    left: 0;
+}
+.TopLeft {
+    z-index: 5 !important;
+}
+
+.HeaderCell {
+    color: #565656 !important;
+    background-color: App.$side-background !important;
+    border: none !important;
+    font-size: 1.8em !important;
+    font-weight: 600 !important;
+    white-space: nowrap;
+}
+
+.LeftHeaderCell {
+    color: #565656 !important;
+    background-color: App.$app-background !important;
+    font-size: 1.8em !important;
+    font-weight: 600 !important;
+    white-space: nowrap;
+}
+
+.InnerCell {
+    font-size: 1.5em !important;
+    &.Valid {
+        color: white;
+        background-color: #529b52;
+        font-weight: bold;
+    }
+    &.Invalid {
+        color: white;
+        background-color: #db2323;
+        font-weight: bold;
+    }
+
+}
+
+.PrintHeading {
+    margin-bottom: 10px;
+    width: fit-content;
+    margin-left: auto;
+}
+.Container.Print {
+    .HeaderCell, .LeftHeaderCell, .InnerCell {
+        font-size: .65em !important;
+        padding: 0 4px !important;
+    }
+    @media print {
+        -webkit-print-color-adjust: exact;
+    }
+    .LeftHeaderCell {
+        padding-left: 10px !important;
+    }
+    .HeaderCell:last-of-type {
+        padding-right: 10px !important;
+    }
+    .InnerCell:last-of-type {
+        padding-right: 10px !important;
+    }
+}
+
+.PrintButton {
+    height: 100%;
+    font-size: 1.3em;
+}

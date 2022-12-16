@@ -1,0 +1,17 @@
+.DatePicker {
+    width: fit-content;
+    position: absolute !important;
+    right: 0;
+    & > * {
+        font-size: .8em !important;
+    }
+    & > label {
+        transform: translate(14px, -7px) scale(0.75);
+    }
+}
+.ValidDay {
+    background-color: #e3ede3 !important;
+}
+.InvalidDay {
+    background-color: #fdefef !important;
+}

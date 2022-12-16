@@ -1,0 +1,14 @@
+.Container {
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+    &.cross svg {
+        transform: translateY(1px);
+        margin-right: .35em;
+    }
+    & > div {
+        margin: 0 !important;
+        margin-bottom: 2px !important;
+        font-size: .85em !important;
+    }
+}

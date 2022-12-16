@@ -1,0 +1,23 @@
+@use "../../App.module.scss" as App;
+
+.Nothing {
+    margin: 0 !important;
+}
+
+.SelectionGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(0, 1fr);
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    & > button {
+        font-size: .8em;
+        background-color: transparent !important;
+        color: App.$side-color;
+        border: 1px solid;
+        border-color: App.$side-background;
+        &.selected {
+            border-color:  App.$side-color;
+        }
+    }
+}

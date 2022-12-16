@@ -1,0 +1,97 @@
+{
+  "name": "air-traffic-control-timekeeper",
+  "version": "0.2.0",
+  "author": "",
+  "homepage": ".",
+  "main": "build/electron/main.js",
+  "private": true,
+  "dependencies": {
+    "@craco/craco": "^6.4.2",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/lab": "^5.0.0-alpha.112",
+    "@mui/material": "^5.11.0",
+    "@testing-library/jest-dom": "^5.15.0",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/user-event": "^13.5.0",
+    "clsx": "^1.1.1",
+    "cross-fetch": "^3.1.5",
+    "date-fns": "^2.26.0",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-reload": "^1.5.0",
+    "print-js": "^1.6.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-icons": "^4.3.1",
+    "react-router-dom": "^6.0.2",
+    "react-scripts": "4.0.3",
+    "react-use": "^17.3.1",
+    "sass": "^1.43.4",
+    "sql.js": "^1.6.2",
+    "typescript": "^4.5.2",
+    "web-vitals": "^2.1.2"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "postinstall": "electron-builder install-app-deps",
+    "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "electron:build:win": "npm run build-api-typings && npm run build && tsc -p electron && electron-builder --win portable",
+    "electron:build": "npm run build-api-typings && npm run build && tsc -p electron && electron-builder",
+    "eject": "craco eject",
+    "build-test": "npm run electron:build && open dist/mac-arm64/air-traffic-control-timekeeper.app",
+    "clean-typings": "rm -rf node_modules/electron/node_modules/@types/node",
+    "build-api-typings": "cd electron && tsc --declaration --emitDeclarationOnly --declarationDir ../src/db-typings && cd ../",
+    "archive": "git archive --format zip --output master.zip master"
+  },
+  "build": {
+    "extends": null,
+    "files": [
+      "build/**/*"
+    ],
+    "productName": "ATC Timekeeper",
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.png"
+    },
+    "portable": {
+      "unicode": false,
+      "artifactName": "ATC Timekeeper.exe"
+    },
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/electron-devtools-installer": "^2.2.0",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^14.18.34",
+    "@types/react": "^17.0.35",
+    "@types/react-dom": "^17.0.11",
+    "@types/sql.js": "^1.4.3",
+    "concurrently": "^6.4.0",
+    "cross-env": "^7.0.3",
+    "electron": "^15.5.7",
+    "electron-builder": "^23.6.0",
+    "wait-on": "^6.0.0"
+  }
+}

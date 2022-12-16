@@ -1,0 +1,18 @@
+.PopupInner {
+    font-size: 1.4em;
+}
+.PopupHeading {
+    font-weight: 600;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.PopupInputs {
+    margin: 0 auto;
+    width: 70%;
+}
+.PopupButtons {
+    margin-top: 25px;
+    & > button {
+        width: 100%;
+    }
+}

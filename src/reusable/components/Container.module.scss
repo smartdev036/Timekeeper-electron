@@ -1,0 +1,39 @@
+.container {
+    display: flex
+}
+.col {
+    flex-direction: column;
+    &:not(.noMargin) > * {
+        margin: 8px 0;
+    }
+    & > *:first-child {
+        margin-top: 0;
+    }
+    & > *:last-child {
+        margin-bottom: 0;
+    }
+}
+.row {
+    flex-direction: row;
+    &:not(.noMargin) > * {
+        margin: 0 8px
+    }
+    & > *:first-child {
+        margin-left: 0
+    }
+    & > *:last-child {
+        margin-right: 0
+    }
+}
+.extend {
+    flex: 1
+}
+.pushRight {
+    margin-left: auto !important
+}
+.pushBottom {
+    margin-top: auto !important
+}
+.noMargin {
+    margin: 0;
+}

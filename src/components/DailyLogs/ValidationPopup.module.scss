@@ -1,0 +1,20 @@
+.PopupHeading {
+    font-weight: 600;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 1.4em;
+}
+
+.log {
+    position: relative;
+    font-size: .85em;
+    span:last-child {
+        margin-left: 0;
+    }
+    .ActionButton {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: .8em;
+    }
+}

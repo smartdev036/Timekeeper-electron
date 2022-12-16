@@ -1,0 +1,63 @@
+.hidden {
+    visibility: hidden;
+}
+.empty {
+    // Use default classes
+}
+.closed {
+    background-color: #c4c8db;
+    color: #444444;
+    opacity: 0.4;
+}
+.red {
+    background-color: #f65f5f;
+    color: white;
+}
+.yellow {
+    background-color: #f0f069;
+    color: #565656;
+}
+.blue {
+    background-color: #679af3;
+    color: white;
+}
+
+.Combined {
+    margin-top: auto;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: .85em;
+    & > div {
+        width: fit-content !important;
+        &:nth-child(1) {
+            font-size: .85em;
+        }
+        &:nth-child(2) {
+            margin-top: -5px;
+            font-weight: 800;
+        }
+    }
+}
+
+.PersonStatus {
+    width: 100%;
+    font-weight: bold;
+    padding: 0 10px;
+    margin-top: 0;
+    padding: 0 10px;
+    white-space: nowrap;
+    & > div:first-child {
+        margin-right: 0 !important;
+    }
+    & > div:last-child {
+        margin-left: auto !important;
+    }
+}
+.PersonType {
+    font-size: 17px;
+    margin: 0 !important;
+    padding: 0;
+    & + div {
+        margin: 0 !important;
+    }
+}

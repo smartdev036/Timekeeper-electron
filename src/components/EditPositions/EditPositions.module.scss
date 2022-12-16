@@ -1,0 +1,44 @@
+.positions {
+    & > div {
+        position: relative;
+        cursor: default;
+        & > .CloseButton {
+            background-color: #e7ebff;
+            color: rgb(160, 158, 158);
+            position: absolute;
+            width: fit-content;
+            height: fit-content;
+            cursor: pointer;
+            display: flex;
+            padding: 6px;
+            transform: scale(0.6);
+            top: -14px;
+            right: -14px;
+            border-radius: 50px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+        }
+        &.empty {
+            background-color: transparent;
+            box-shadow: none;
+            background-image: linear-gradient(90deg, silver 50%, transparent 50%), linear-gradient(90deg, silver 50%, transparent 50%), linear-gradient(0deg, silver 50%, transparent 50%), linear-gradient(0deg, silver 50%, transparent 50%);
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
+            background-position: left top, right bottom, left bottom, right   top;
+            cursor: default;
+            &.selected {
+                animation: border-dance 1s infinite linear;
+                cursor: pointer;
+            }
+
+        }
+    }
+}
+
+@keyframes border-dance {
+    0% {
+    background-position: left top, right bottom, left bottom, right   top;
+    }
+    100% {
+    background-position: left 15px top, right 15px bottom , left bottom 15px , right   top 15px;
+}
+}

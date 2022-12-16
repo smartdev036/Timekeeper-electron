@@ -1,0 +1,27 @@
+.Box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 160px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    border-radius: 3px;
+    align-items: center;
+    font-size: 1.3em;
+    color: #565656;
+    background-color: #e7ebff;
+    cursor: pointer;
+    transition: box-shadow .3s, filter .2s, transform .2s;
+    &.hidden {
+        visibility: hidden;
+    }
+    &.hovered {
+        filter: brightness(0.85);
+        box-shadow: none;
+        transform: scale(0.95);
+    }
+
+    .Shorthand {
+        font-size: 1.3em;
+        font-weight: bold;
+    }
+}

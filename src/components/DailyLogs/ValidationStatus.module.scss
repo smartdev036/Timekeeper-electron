@@ -1,0 +1,22 @@
+.validationStatus {
+    margin-top: auto;
+    font-size: .6em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    &.check {
+        color: #228B22;
+        svg {
+            margin-right: .4em;
+            transform: translateY(.5px);
+        }    
+    }
+    &.cross {
+        color: rgb(219, 35, 35);
+        svg {
+            margin-right: .28em;
+            transform: scale(1.05) translateY(.3px);
+        }    
+
+    }
+}
