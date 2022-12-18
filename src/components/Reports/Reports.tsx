@@ -1,7 +1,9 @@
 import StateSelect from "../../inputs/StateSelect"
 import Container from "../../reusable/components/Container"
 import styles from "./Reports.module.scss"
-import DateRangePicker, { DateRange } from '@mui/lab/DateRangePicker';
+// import DateRangePicker, { DateRange } from '@mui/lab/DateRangePicker';
+import { DateRangePicker, DateRange } from '@mui/x-date-pickers-pro/DateRangePicker';
+
 import { Fragment, useEffect, useState } from "react";
 import { Box, TextField } from "@mui/material";
 import ReportTable, { PrintReportButton } from "./ReportTable";

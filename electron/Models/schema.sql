@@ -13,16 +13,22 @@ CREATE TABLE crew_controllers (
     crew_id INTEGER CHECK( crew_id > 0 ) NOT NULL,
     PRIMARY KEY (controller_id)
 );
+-- CREATE TABLE bullpen (
+--     type TEXT CHECK( type IN ('controller') ) NOT NULL,
+--     id INTEGER CHECK( id > 0 ) NOT NULL,
+--     PRIMARY KEY (type, id)
+-- );
+
+-- IF NOT EXISTS( SELECT time_since_lastin
+--             FROM bullpen)  THEN
+--   ALTER TABLE bullpen ADD time_since_lastin TEXT;
+-- END IF;
 CREATE TABLE bullpen (
     type TEXT CHECK( type IN ('controller') ) NOT NULL,
     id INTEGER CHECK( id > 0 ) NOT NULL,
+    time_since_lastin TEXT,
     PRIMARY KEY (type, id)
 );
-
-IF NOT EXISTS( SELECT time_since_lastin
-            FROM bullpen)  THEN
-  ALTER TABLE bullpen ADD time_since_lastin TEXT;
-END IF;
 
 CREATE TABLE positions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

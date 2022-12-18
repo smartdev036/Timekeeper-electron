@@ -10,8 +10,11 @@ import {
 } from "react-router-dom";
 import { ThemeProvider } from '@mui/material';
 import theme from './theme';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+// import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from "@mui/x-date-pickers";
+// import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { FiClock } from 'react-icons/fi';
 import clsx from 'clsx';
 import Controllers from './components/Controllers/Controllers';
@@ -24,7 +27,7 @@ import AllDailyValidated from './components/DailyLogs/AllDailyValidated';
 import { ProvideReRender } from './reusable/hooks/useReRender';
 import Logo from "./static/logo.png"
 import { useInterval } from 'react-use';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LocalDate from './reusable/LocalDate';
 import LocalTime from './reusable/LocalTime';
 import ErrorBoundary from './reusable/components/ErrorBoundary';
@@ -35,11 +38,11 @@ interface RouterLinkProps {
     label: string
 }
 
-const RouterLink = ({to, label}: RouterLinkProps) => {
+const RouterLink = ({ to, label }: RouterLinkProps) => {
     return (
         <NavLink
-        to={to}
-        className={({ isActive }) => clsx(styles.RouterLink, isActive ? styles.active : "")}
+            to={to}
+            className={({ isActive }) => clsx(styles.RouterLink, isActive ? styles.active : "")}
         >{label}</NavLink>
     )
 }
@@ -57,9 +60,9 @@ const Inner = () => {
         setLocalDate(new LocalDate())
         setLocalTime(new LocalTime())
     }, 10 * 1000)
-   
+
     const utcTime = localTime.convertToUTC()
-    
+
     const localTimeDateString = `${localDate.getMonthName()} ${localDate.date}`
 
     return (
@@ -67,7 +70,7 @@ const Inner = () => {
             <Container className={styles.Main} >
                 <Container noMargin={true} className={styles.Header}>
                     <img src={Logo} className={styles.Logo} />
-                    <div className={styles.Time}><FiClock/>{localTimeDateString} | {localTime.formatToString()} | {utcTime.formatToZ()}</div>
+                    <div className={styles.Time}><FiClock />{localTimeDateString} | {localTime.formatToString()} | {utcTime.formatToZ()}</div>
                 </Container>
                 <Container noMargin={true} className={styles.InnerContainer}>
                     <Routes>
@@ -94,7 +97,7 @@ const Inner = () => {
                     <RouterLink to="/settings" label="Settings" />
                 </Container>
                 <Container push="bottom" noMargin={true}>
-                    <AllDailyValidated/>
+                    <AllDailyValidated />
                 </Container>
             </Container>
         </Container>
@@ -102,6 +105,9 @@ const Inner = () => {
 }
 
 function App() {
+    useEffect(() => {
+        console.log("App is running ....")
+    }, [])
     return (
         <ErrorBoundary>
             <ThemeProvider theme={theme}>

@@ -16,7 +16,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       // nodeIntegration: true,
     },
-    autoHideMenuBar: true
+    // autoHideMenuBar: true
   })
 
   if (app.isPackaged) {
@@ -51,9 +51,9 @@ app.whenReady().then(() => {
   }
   
   // DevTools
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err));
+  // installExtension(REACT_DEVELOPER_TOOLS)
+  //   .then((name) => console.log(`Added Extension:  ${name}`))
+  //   .catch((err) => console.log('An error occurred: ', err));
 
   createWindow();
   require("./DB")

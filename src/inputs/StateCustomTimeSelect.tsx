@@ -34,7 +34,8 @@ const StateTimeSelect = (props: StateTimeSelectProps) => {
       defaultValue={props.defaultValue ?? 60}
       onChange={onChange}
       onBlur={onBlur}
-    />
+      label={props.label}
+      />
   );
 };
 
