@@ -30,3 +30,13 @@
         margin-bottom: 10px !important;
     }
 }
+
+.OverflowWrapper {
+    width: 100%;
+    word-break: break-word;
+    text-align: center;
+}
+.ScrollerAuto {
+    overflow-x: hidden;
+    overflow-y: auto;
+}

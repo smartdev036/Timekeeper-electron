@@ -155,8 +155,8 @@ const PositionPopupInner = ({
   return (
     <Container className={styles.PopupInner} noMargin={true}>
       <Container noMargin={true} className={styles.PopupHeading}>
-        <div>{position.name}</div>
-        <div>({position.shorthand})</div>
+        <div className={styles.OverflowWrapper}>{position.name}</div>
+        <div className={styles.OverflowWrapper}>{position.shorthand}</div>
       </Container>
       {props.combined ? (
         <Container className={styles.CombinedMessage}>
