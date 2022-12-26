@@ -5,6 +5,11 @@
     font-size: 1.4em;
 }
 
+.LogTimesContainer {
+    max-height: 450px;
+    overflow: auto;
+}
+
 .log {
     position: relative;
     font-size: .85em;
