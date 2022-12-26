@@ -31,7 +31,7 @@ const StateTimeSelect = (props: StateTimeSelectProps) => {
         inputProps: { maxLength: 15 },
         endAdornment: <InputAdornment position="end">Minutes</InputAdornment>,
       }}
-      defaultValue={props.defaultValue ?? 60}
+      // defaultValue={props.defaultValue ?? 60}
       onChange={onChange}
       onBlur={onBlur}
       label={props.label}
