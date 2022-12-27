@@ -2,13 +2,16 @@
     width: fit-content;
     position: absolute !important;
     right: 20px;
-    top: 15px;
+    top: 18px;
     & > * {
         font-size: .8em !important;
     }
     & > label {
         transform: translate(14px, -7px) scale(0.75);
     }
+}
+:global(.FarRight) {
+    right: 55px;
 }
 .ValidDay {
     background-color: #e3ede3 !important;

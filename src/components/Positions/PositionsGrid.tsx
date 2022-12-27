@@ -14,6 +14,8 @@ import TopRightDatePicker from "../../inputs/TopRightDatePicker";
 import { useInterval } from "react-use";
 import PositionGridSkeleton from "./PositionGridSkeleton";
 import LocalTime from "../../reusable/LocalTime";
+import OffCanvasMenu from "../Bullpen/OffCanvasMenu";
+import BullPenSide from "../Bullpen/BullpenSide";
 
 interface PositionBoxProps {
   date: LocalDate;
@@ -176,6 +178,7 @@ const PositionsGrid = () => {
   const { ReRender, counter } = useReRender();
 
   const [date, setDate] = useState<LocalDate>(new LocalDate());
+  const [sideMenuOpen, setSideMenuOpen] = useState(true)
 
   const { value: positions_value } = useAsyncRefresh(
     () => DB.Positions.GetAll(date.toSerialized()),
@@ -220,9 +223,17 @@ const PositionsGrid = () => {
 
   const HoveringBox = useState<number | null>(null);
 
+  const updateSideBarState = ():void => {
+    setSideMenuOpen(prev => !prev)
+  }
+
   return (
     <Fragment>
-      <TopRightDatePicker label="Date" state={[date, setDate]} />
+      <TopRightDatePicker label="Date" state={[date, setDate]} className='FarRight'/>
+      <OffCanvasMenu  updateSideBarState={updateSideBarState} />
+      {/* <BullPenSide className={clsx(sideMenuOpen ? styles.openSideBar : styles.closeSideBar )}/> */}
+      <BullPenSide className={(sideMenuOpen ? styles.openSideBar : styles.closeSideBar )}/>
+      <div id="main" className={(sideMenuOpen ? styles.openMain : styles.closeMain )}>
       <PositionGridSkeleton>
         {new Array(18).fill(null).map((_, i) => {
           const position = positionMap[i] as Positions | undefined;
@@ -268,6 +279,8 @@ const PositionsGrid = () => {
           );
         })}
       </PositionGridSkeleton>
+      </div>
+
     </Fragment>
   );
 };

@@ -1,0 +1,11 @@
+.OffCanvasMenu {
+  width: fit-content;
+  position: absolute !important;
+  right: 15px;
+  top: 18px;
+  font-size: 23px;
+  font-weight: bold;
+  &:hover {
+    transform: scale(1.1);
+  }
+}

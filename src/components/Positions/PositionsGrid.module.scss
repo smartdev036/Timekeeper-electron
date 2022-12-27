@@ -61,3 +61,30 @@
         margin: 0 !important;
     }
 }
+
+:global(#main) {
+    transition: margin-right .5s;
+    overflow: auto;
+    height: 100%;
+}
+
+
+.openSideBar {
+    width: 200px ; 
+    background-color: rgba(0,0,0,0.4);
+    opacity: 1;
+}
+  
+.closeSideBar {
+    width: 0px; 
+    background-color: white;
+    opacity: 0;
+}
+
+.openMain {
+    margin-right: 200px;
+}
+  
+.closeMain {
+    margin-right: 0px;
+}

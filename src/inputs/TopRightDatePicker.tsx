@@ -15,6 +15,7 @@ export type GetDayStatusFunc = (props: PickersDayProps<Date>) => Promise<"valid"
 interface TopRightDatePickerProps {
     label: string
     state?: [LocalDate, React.Dispatch<React.SetStateAction<LocalDate>>]
+    className?: string
     GetDayStatus?: GetDayStatusFunc
 }
 
@@ -56,7 +57,7 @@ const TopRightDatePicker = (props: TopRightDatePickerProps) => {
             <TextField
             {...params}
             size="small"
-            className={clsx(params.className, styles.DatePicker)}
+            className={clsx(styles.DatePicker, props.className )}            
             />
         )}
         renderDay={(day:any, selected:any, DayProps:any) => (
