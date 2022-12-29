@@ -130,6 +130,15 @@ const PositionPopupInner = ({
     if (TimeErrorState[0])
       return setTimeout(() => alert("Enter a valid time."));
     if (!(await ConfirmFutureTime("closing", State.time[0]))) return;
+
+    // Add bulletin when removed from active position
+    if(status?.trainee_controller_id){
+      DB.Bullpen.Add(Number(status?.trainee_controller_id))
+    } 
+    if(status?.controller_id) {
+      DB.Bullpen.Add(Number(status?.controller_id))
+    }
+
     DB.Bullpen.UpdateTimeSinceInActive(
       Number(status?.trainee_controller_id),
       new Date().getTime().toString()

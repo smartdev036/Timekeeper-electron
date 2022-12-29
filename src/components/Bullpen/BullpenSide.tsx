@@ -40,7 +40,7 @@ const AddBullpenPopup = () => {
   const HandleAdd = async () => {
     if (ref.current === null) return
     if (ref.current.type === "Controller") {
-      await DB.Bullpen.Add(ref.current.id)
+      await DB.Bullpen.AddWithActiveTest(ref.current.id)
     } else {
       await DB.Bullpen.AddCrew(ref.current.id)
     }
