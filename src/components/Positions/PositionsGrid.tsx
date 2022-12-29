@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import styles from "./PositionsGrid.module.scss";
 import Container from "../../reusable/components/Container";
 import Popup from "../../reusable/components/Popup";
@@ -31,8 +31,9 @@ interface PositionBoxProps {
 }
 
 const PositionBox = ({ position, status, ...props }: PositionBoxProps) => {
-
-  const getPositionValuesForController =  (position_id: any) => {
+  const [minutesDiff, setMinutesDiff] = useState(0);
+  const [minutesDiffForTrainee, setMinutesDiffForTrainee] = useState(0);
+  const getPositionValuesForController = useCallback((position_id: any) => {
     let positionsStatusValues = props.all_position_status_values?.filter((i: any) => i.position_id == position_id)
     if(positionsStatusValues?.length && position_id){
       let time = positionsStatusValues[0].start_time
@@ -45,13 +46,14 @@ const PositionBox = ({ position, status, ...props }: PositionBoxProps) => {
         }
         time = tmpObj.start_time
       }
+      return time
     }else{
       return 0
     }
-  }
-  const getPositionValuesForTrainee =  (position_id: any) => {
+  }, [position, status, props])
+  const getPositionValuesForTrainee = useCallback((position_id: any) => {
     let positionsStatusValues = props.all_position_status_values?.filter((i: any) => i.position_id == position_id)
-    if(positionsStatusValues?.length && position_id){
+    if (positionsStatusValues?.length && position_id) {
       let time = positionsStatusValues[0].start_time
       let prevousId = positionsStatusValues[0].trainee_controller_id
       for(let i = 0; i < positionsStatusValues.length; i++){
@@ -62,28 +64,29 @@ const PositionBox = ({ position, status, ...props }: PositionBoxProps) => {
         }
         time = tmpObj.start_time
       }
+      return time
     }else{
       return 0
     }
-  }
+  }, [position, status, props])
 
-  const CalcMinDiff = () => {
+  const CalcMinDiff = useCallback(() => {
     const startTime = LocalTime.fromSerialized(
       getPositionValuesForController(position?.id) ?? 0
     ).mergeDate(LocalDate.fromSerialized(status?.log_date ?? ""));
 
     const dt = new Date();
     return (dt.getTime() - startTime.getTime()) / 1000 / 60;
-  };
-  const CalcMinDiffForTrainee = () => {
+  }, [position, status, props]);
+  const CalcMinDiffForTrainee = useCallback(() => {
     const startTime = LocalTime.fromSerialized(
       getPositionValuesForTrainee(position?.id) ?? 0
     ).mergeDate(LocalDate.fromSerialized(status?.log_date ?? ""));
     const dt = new Date();
     return (dt.getTime() - startTime.getTime()) / 1000 / 60;
-  };
-  const [minutesDiff, setMinutesDiff] = useState(CalcMinDiff());
-  const [minutesDiffForTrainee, setMinutesDiffForTrainee] = useState(CalcMinDiffForTrainee());
+  }, [position, status, props]);
+
+
 
   useInterval(() => {
     setMinutesDiff(CalcMinDiff());
@@ -93,7 +96,7 @@ const PositionBox = ({ position, status, ...props }: PositionBoxProps) => {
   useEffect(() => {
     setMinutesDiff(CalcMinDiff());
     setMinutesDiffForTrainee(CalcMinDiffForTrainee());
-  });
+  }, [position, status, props]);
 
   const color: "closed" | "hidden" | "empty" | "red" | "blue" | "yellow" =
     status?.controller_id === 0 || props.combined
@@ -178,12 +181,14 @@ const PositionsGrid = () => {
   const { ReRender, counter } = useReRender();
 
   const [date, setDate] = useState<LocalDate>(new LocalDate());
-  const [sideMenuOpen, setSideMenuOpen] = useState(true)
+  const [sideMenuOpen, setSideMenuOpen] = useState(false)
 
   const { value: positions_value } = useAsyncRefresh(
     () => DB.Positions.GetAll(date.toSerialized()),
     [DB, date, counter]
   );
+
+  // Position Map
   const positionMap = Object.fromEntries(
     positions_value?.result.map((position) => [position.position, position]) ??
     []
@@ -194,6 +199,7 @@ const PositionsGrid = () => {
     positions_value?.result.map((position) => [position.id, position]) ?? []
   );
 
+  // Position Status
   const { value: position_status_value } = useAsyncRefresh(
     () => DB.LogTimes.GetAllPositionsStatus(date.toSerialized()),
     [DB, date, counter]
@@ -227,11 +233,18 @@ const PositionsGrid = () => {
     setSideMenuOpen(prev => !prev)
   }
 
+
+  if (positions_value === undefined
+    || position_status_value === undefined
+    || all_position_status_values === undefined
+    || combinations_value === undefined
+    || combinations_center_value === undefined
+  ) return null
+
   return (
     <Fragment>
       <TopRightDatePicker label="Date" state={[date, setDate]} className='FarRight'/>
       <OffCanvasMenu  updateSideBarState={updateSideBarState} />
-      {/* <BullPenSide className={clsx(sideMenuOpen ? styles.openSideBar : styles.closeSideBar )}/> */}
       <BullPenSide className={(sideMenuOpen ? styles.openSideBar : styles.closeSideBar )}/>
       <div id="main" className={(sideMenuOpen ? styles.openMain : styles.closeMain )}>
       <PositionGridSkeleton>
