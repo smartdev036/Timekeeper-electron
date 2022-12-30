@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import DB from "../../DB";
+import DB, { ElectronAlert, ElectronConfirm } from "../../DB";
 import { LogTimes, Positions } from "../../db-typings/electron/Models";
 import Button from "../../inputs/Button";
 import Container from "../../reusable/components/Container";
@@ -58,7 +58,7 @@ const PositionPopupInner = ({
     }
     const message =
       "You're adding a log before the current one. Are you sure you want to add this log?";
-    return window.confirm(message);
+    return ElectronConfirm(message);
   };
 
   const WrapPositionAdding = (func: () => Promise<void | NodeJS.Timeout>) => {
@@ -74,7 +74,7 @@ const PositionPopupInner = ({
           )
         ) {
           return setTimeout(() =>
-            alert("Log already exists for the position at this time.")
+            ElectronAlert("Log already exists for the position at this time.")
           );
         }
         throw error;
@@ -86,7 +86,7 @@ const PositionPopupInner = ({
     if (State.time[0] === null) return;
     if (State.controller[0] === null) return;
     if (TimeErrorState[0])
-      return setTimeout(() => alert("Enter a valid time."));
+      return setTimeout(() => ElectronAlert("Enter a valid time."));
     if (!(await ConfirmFutureTime("adding", State.time[0]))) return;
 
     if (status?.controller_id != State.controller[0].id) {
@@ -125,10 +125,10 @@ const PositionPopupInner = ({
 
   const HandleClose = WrapPositionAdding(async () => {
     if (State.time[0] === null) {
-      return setTimeout(() => alert("Set close time."));
+      return setTimeout(() => ElectronAlert("Set close time."));
     }
     if (TimeErrorState[0])
-      return setTimeout(() => alert("Enter a valid time."));
+      return setTimeout(() => ElectronAlert("Enter a valid time."));
     if (!(await ConfirmFutureTime("closing", State.time[0]))) return;
 
     // Add bulletin when removed from active position

@@ -1,4 +1,4 @@
-import DB from "../../DB";
+import DB, { ElectronAlert } from "../../DB";
 import { Positions } from "../../db-typings/electron/Models";
 import Button from "../../inputs/Button";
 import Heading from "../../reusable/components/Heading";
@@ -41,24 +41,25 @@ const CombinePopup = (props: CombinePopupProps) => {
           props.trainee_controller_id,
           new Date().getTime().toString()
         );
+      props.closePopup();
+      ReRender();    
     } catch (error) {
       if ((error as Error).message.includes("position_B is empty")) {
         return setTimeout(() => {
-          alert(
+          ElectronAlert(
             `${position.shorthand} must be either assigned a controller, be closed, or combined with another position.`
           );
         });
-      } else if ((error as Error).message.includes("Already exists")) {
+      } 
+      else if ((error as Error).message.includes("Already exists")) {
         return setTimeout(() => {
-          alert(
+          ElectronAlert(
             `${position.shorthand} is already combined with ${props.position.shorthand}`
           );
         });
       }
       throw error;
     }
-    props.closePopup();
-    ReRender();
   };
 
   return (

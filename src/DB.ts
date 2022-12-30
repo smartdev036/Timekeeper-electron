@@ -33,4 +33,13 @@ const DB = new Proxy({}, {
     }    
 }) as DBWrappedTyping
 
+export const ElectronAlert = function(str: string) {
+    ipc.send("alert", str);
+}
+
+export const ElectronConfirm = function(str: string) {
+    let res = ipc.invoke("question", str)
+    return res
+}
+
 export default DB

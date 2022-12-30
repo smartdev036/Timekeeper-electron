@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import DB from "../../DB"
+import DB, { ElectronAlert } from "../../DB"
 import { LogTimes, Positions } from "../../db-typings/electron/Models"
 import Button from "../../inputs/Button"
 import Container from "../../reusable/components/Container"
@@ -56,7 +56,7 @@ const EditLog = ({position, trigger, log}: EditLogProps) => {
     const HandleAdd = async () => {
         if (State.time[0] === null) return
         if (State.controller[0] === null) return
-        if (TimeErrorState[0]) return setTimeout(() => alert("Enter a valid time."))
+        if (TimeErrorState[0]) return setTimeout(() => ElectronAlert("Enter a valid time."))
 
         await DB.LogTimes.Update(log, {
             position_id: log.position_id,
@@ -72,9 +72,9 @@ const EditLog = ({position, trigger, log}: EditLogProps) => {
 
     const HandleClose = async () => {
         if (State.time[0] === null) {
-            return setTimeout(() => alert("Set close time."))
+            return setTimeout(() => ElectronAlert("Set close time."))
         }
-        if (TimeErrorState[0]) return setTimeout(() => alert("Enter a valid time."))
+        if (TimeErrorState[0]) return setTimeout(() => ElectronAlert("Enter a valid time."))
         
         await DB.LogTimes.Update(log, {
             position_id: log.position_id,

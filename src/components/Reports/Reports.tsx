@@ -8,7 +8,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Box, TextField } from "@mui/material";
 import ReportTable, { PrintReportButton } from "./ReportTable";
 import { ReportTypes } from "../../db-typings/electron/Models/LogTimes";
-import DB from "../../DB";
+import DB, { ElectronAlert } from "../../DB";
 import { useNavigate } from "react-router-dom";
 import LocalDate from "../../reusable/LocalDate";
 
@@ -30,7 +30,7 @@ const Reports = () => {
                     const date = LocalDate.fromSerialized(serialized_date)
                     return `${date.getMonthName()} ${date.date} is unvalidated.`
                 })
-                window.alert(warnings.join("\n"))
+                ElectronAlert(warnings.join("\n"))
                 navigate("/daily-logs")
             }
         })()

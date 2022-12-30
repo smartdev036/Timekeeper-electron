@@ -1,3 +1,4 @@
+import { ElectronAlert } from "../../DB";
 import copyToClipboard from "./copyToClipboard";
 
 type BaseFunc = (...args: any[]) => Promise<any>
@@ -7,7 +8,7 @@ const AsyncErrorCatcher = <T extends BaseFunc>(caller: T) => {
         try {
             return await caller(...args);
         } catch (_) {
-            alert("An unknown error occured, details copied to clipboard.");
+            ElectronAlert("An unknown error occured, details copied to clipboard.");
             const error = _ as Error
             
             await copyToClipboard(JSON.stringify({

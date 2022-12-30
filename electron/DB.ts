@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, dialog } from "electron";
 import * as Modules from "./Models"
 
 type CallerMap = {
@@ -33,3 +33,22 @@ ipcMain.handle('call', async (event, call: string, ...args: any[]) => {
         result: typeof func === "undefined" ? undefined : await func(...args)
     }
 })
+
+ipcMain.on("alert",(event,message)=>{
+    dialog.showMessageBox({
+        type: 'info',
+        message: message
+    });
+});
+
+
+ipcMain.handle("question", async (event, message)=>{
+    let res = await dialog.showMessageBox({
+        type: 'question',
+        message: message,
+        buttons: ['OK', 'Cancel'],
+    });
+    if( res.response === 0) return true 
+    else if (res.response === 1) return false
+    return res
+});

@@ -2,7 +2,7 @@
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import DB from "../../DB";
+import DB, { ElectronAlert } from "../../DB";
 import { Positions } from "../../db-typings/electron/Models";
 import Button from "../../inputs/Button";
 import StateCheckbox from "../../inputs/Checkbox";
@@ -91,7 +91,7 @@ const PositionsPopup = (props: PositionsPopupProps) => {
           .includes("UNIQUE constraint failed: positions.shorthand")
       ) {
         State.shorthand[1]("");
-        return setTimeout(() => alert("Shorthand must be unique."));
+        return setTimeout(() => ElectronAlert("Shorthand must be unique."));
       }
       throw error;
     }

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import DB from "../../DB"
+import DB, { ElectronAlert } from "../../DB"
 import { Controller } from "../../db-typings/electron/Models"
 import Button from "../../inputs/Button"
 import StateTextInput from "../../inputs/StateTextInput"
@@ -51,7 +51,7 @@ const ControllerPopup = (props: ControllerPopupProps) => {
         } catch (error) {
             if ((error as Error).toString().includes("UNIQUE constraint failed: controllers.initials")) {
                 State.initials[1]("")
-                return setTimeout(() => alert("Initials must be unique."))
+                return setTimeout(() => ElectronAlert("Initials must be unique."))
             }
             throw error
         }

@@ -1,8 +1,10 @@
+import { ElectronAlert } from "../../DB";
+
 const copyToClipboard = async (text: string) => {
     try {
         await navigator.clipboard.writeText(text);
       } catch (error) {
-        alert(`Error occured while copying to clipboard. ${error}`);
+        ElectronAlert(`Error occured while copying to clipboard. ${error}`);
     }    
 }
 
