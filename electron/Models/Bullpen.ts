@@ -27,6 +27,20 @@ class Bullpen {
         Close(db, true)
     }
 
+    static async AddWithActiveTime(id: number, time_since_lastin: string) {
+        assert(id !== 0)
+        const db = await Open()
+        db.run(`
+            INSERT INTO bullpen (type, id, time_since_lastin)
+            VALUES ($type, $id, $time_since_lastin)
+        `, {
+            $type: "controller",
+            $id: id,
+            $time_since_lastin: time_since_lastin
+        })
+        Close(db, true)
+    }
+
     static async AddWithActiveTest(id: number) {
         assert(id !== 0)
         let today = new LocalDate().toSerialized()
@@ -87,36 +101,16 @@ class Bullpen {
         const db = await Open()
 
         // Check if exist 
-        const result = db.exec(
-            `
-            select max(start_time) as max_time, controller_id, "trainee_controller_id"
-            from log_times 
-            where log_date='2022-12-29'
-            group By (position_id)
-            `
-        )
-
-        let flag_as_controller = AsObject<{
-            max_time: number ,
-            controller_id: number, 
-            trainee_controller_id: number, 
-        }>(await result)
-
-        let flag_as_trainee_controller = AsObject<{
-            max_time: number ,
-            controller_id: number, 
-            trainee_controller_id: number, 
-        }>(await result)
+        const status = await LogTimes.GetAllPositionsStatus(new LocalDate().toSerialized(),undefined)
+        
+        const busy_controller_ids = (status ?? []).map(row => [row.controller_id, row.trainee_controller_id]).flat()
 
         const stmnt = db.prepare(
             `INSERT OR IGNORE INTO bullpen (type, id, time_since_lastin)
             VALUES ($type, $id, $time_since_lastin)`
         )
         for (const controller of controllers) {
-
-            if( flag_as_controller.filter(row => row?.controller_id === controller.id ).length === 0 
-                && flag_as_trainee_controller.filter(row => row?.trainee_controller_id === controller.id ).length === 0 
-            ){
+            if( busy_controller_ids.filter(id => id === controller.id ).length === 0){
                 stmnt.run({
                     $type: "controller",
                     $id: controller.id,

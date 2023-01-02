@@ -22,24 +22,42 @@ const AddBullpenPopup = () => {
 
     const {value: controller_value} = useAsyncRefresh(() => DB.Controller.GetAll(), [DB, counter])
     const {value: crew_value} = useAsyncRefresh(() => DB.Crew.GetAll(), [DB, counter])
-    
-    const controllers: OptionType[] = controller_value?.result.map(controller => ({
-        type: "Controller",
-        label: `${controller.initials} - ${controller.first_name} ${controller.last_name}`,
-        id: controller.id
-    })) ?? []
+
     const crew: OptionType[] = crew_value?.result.map(crew => ({
         type: "Crew",
         label: crew.name,
         id: crew.id
     })) ?? []
 
+    const until = {
+        date: new LocalDate().toSerialized(),
+        time: undefined
+    }
+
+    const {value: status} = useAsyncRefresh(() => {
+        return DB.LogTimes.GetAllPositionsStatus(until.date, until.time)
+    })
+    
+    const busy_controllers = (status?.result ?? []).map(row => [row.controller_id, row.trainee_controller_id]).flat()
+    
+    const controllers: OptionType[] = (controller_value?.result
+        .filter(controller => {
+            const isUnavailable = busy_controllers.includes(controller.id)
+            return !isUnavailable
+        })
+        .map(controller => ({
+            type: "Controller",
+            label: `${controller.initials} - ${controller.first_name} ${controller.last_name}`,
+            id: controller.id
+        })) ?? [])
+
+
     const ref = useRef<OptionType | null>(null)
 
     const HandleAdd = async () => {
         if (ref.current === null) return
         if (ref.current.type === "Controller") {
-            await DB.Bullpen.AddWithActiveTest(ref.current.id)
+            await DB.Bullpen.Add(ref.current.id)
         } else {
             await DB.Bullpen.AddCrew(ref.current.id)
         }

@@ -91,25 +91,49 @@ const PositionPopupInner = ({
 
     if (status?.controller_id != State.controller[0].id) {
       if (State?.trainee[0]?.id != status?.controller_id) {
-        DB.Bullpen.UpdateTimeSinceInActive(
-          Number(status?.controller_id),
-          new Date().getTime().toString()
-        );
+        // If not exist, so new one        
+        try {
+          await DB.Bullpen.Add(Number(status?.controller_id))
+        } catch (e) {
+          console.log("error: ", e)
+        }
+        // await DB.Bullpen.UpdateTimeSinceInActive(
+        //   Number(status?.controller_id),
+        //   new Date().getTime().toString()
+        // );
       }
-      if(State.controller[0].id){
-        DB.Bullpen.UpdateTimeSinceInActive(State.controller[0].id, "0");
+      if (status?.trainee_controller_id != State?.controller[0].id) {
+        try {
+          DB.Bullpen.Delete(Number(State.controller[0].id))
+        } catch (e) {
+          console.log("error2: ", e)
+        }
       }
+      //   DB.Bullpen.UpdateTimeSinceInActive(State.controller[0].id, "0");
     }
- 
+
+    if (status?.trainee_controller_id != State.controller[0].id && status?.trainee_controller_id != State?.trainee[0]?.id) {
+      try {
+        await DB.Bullpen.Add(Number(status?.trainee_controller_id))
+      } catch (e) {
+        console.log("error3: ", e)
+      }
+      // await DB.Bullpen.UpdateTimeSinceInActive(
+      //   Number(status?.trainee_controller_id),
+      //   new Date().getTime().toString()
+      // );
+    }
+
     if (State?.trainee[0]?.id) {
-      if (status?.trainee_controller_id != State.controller[0].id && status?.trainee_controller_id != State?.trainee[0]?.id) {
-        DB.Bullpen.UpdateTimeSinceInActive(
-          Number(status?.trainee_controller_id),
-          new Date().getTime().toString()
-        );
+      if (status?.controller_id != State?.trainee[0]?.id && status?.trainee_controller_id != State?.trainee[0]?.id) {
+        try {
+          await DB.Bullpen.Delete(Number(State?.trainee[0]?.id))
+        } catch (e) {
+          console.log("error4: ", e)
+        }
       }
-      DB.Bullpen.UpdateTimeSinceInActive(Number(State?.trainee[0]?.id), "0");
     }
+    // DB.Bullpen.UpdateTimeSinceInActive(Number(State?.trainee[0]?.id), "0");
 
     await DB.LogTimes.Add({
       position_id: position.id,
@@ -132,21 +156,27 @@ const PositionPopupInner = ({
     if (!(await ConfirmFutureTime("closing", State.time[0]))) return;
 
     // Add bulletin when removed from active position
-    if(status?.trainee_controller_id){
-      DB.Bullpen.Add(Number(status?.trainee_controller_id))
-    } 
-    if(status?.controller_id) {
-      DB.Bullpen.Add(Number(status?.controller_id))
+    if (status?.trainee_controller_id) {
+      try {
+        await DB.Bullpen.Add(Number(status?.trainee_controller_id))
+        await DB.Bullpen.UpdateTimeSinceInActive(
+          Number(status?.trainee_controller_id), new Date().getTime().toString()
+        );
+      } catch (e) {
+        console.log('Popup Iner: ', e)
+      }
+    }
+    if (status?.controller_id) {
+      try {
+        await DB.Bullpen.Add(Number(status?.controller_id))
+        await DB.Bullpen.UpdateTimeSinceInActive(
+          Number(status?.controller_id), new Date().getTime().toString()
+        );          
+      } catch(e) {
+        console.log('popup error: ', e)
+      }
     }
 
-    DB.Bullpen.UpdateTimeSinceInActive(
-      Number(status?.trainee_controller_id),
-      new Date().getTime().toString()
-    );
-    DB.Bullpen.UpdateTimeSinceInActive(
-      Number(status?.controller_id),
-      new Date().getTime().toString()
-    );
     await DB.LogTimes.Close({
       position_id: position.id,
       log_date: date.toSerialized(),

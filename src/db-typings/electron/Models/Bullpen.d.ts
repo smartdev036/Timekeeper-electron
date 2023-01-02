@@ -7,6 +7,7 @@ interface Bullpen {
 }
 declare class Bullpen {
     static Add(id: number): Promise<void>;
+    static AddWithActiveTime(id: number, time_since_lastin: string): Promise<void>;
     static AddWithActiveTest(id: number): Promise<void>;
     static UpdateTimeSinceInActive(controllerId: number, time_since_lastin: string): Promise<void>;
     static AddCrew(id: number): Promise<void>;
