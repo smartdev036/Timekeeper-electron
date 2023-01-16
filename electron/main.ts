@@ -16,7 +16,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       // nodeIntegration: true,
     },
-    autoHideMenuBar: false
+    autoHideMenuBar: true
   })
 
   if (app.isPackaged) {
