@@ -12,6 +12,7 @@ declare class UTCTime {
     static fromSerialized(serialized_time: number): UTCTime;
     toSerialized(): number;
     formatToZ(): string;
+    formatToWithoutZ(): string;
     mergeDate(date: UTCDate): Date;
 }
 export default UTCTime;

@@ -12,3 +12,14 @@
         font-size: .85em !important;
     }
 }
+.saveasfile {
+    margin-bottom: 10px;
+    text-align: center;
+    border: 2px dotted blue;
+    padding:4px;
+    border-radius: 50%;
+    &:hover {
+        background-color: #4e83d1;
+        color: white;
+    }
+}

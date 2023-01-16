@@ -83,6 +83,8 @@ const PositionPopupInner = ({
   };
 
   const HandleAdd = WrapPositionAdding(async () => {
+    await HandleDecombine()
+
     if (State.time[0] === null) return;
     if (State.controller[0] === null) return;
     if (TimeErrorState[0])
@@ -148,6 +150,8 @@ const PositionPopupInner = ({
   });
 
   const HandleClose = WrapPositionAdding(async () => {
+    await HandleDecombine()
+
     if (State.time[0] === null) {
       return setTimeout(() => ElectronAlert("Set close time."));
     }
@@ -171,8 +175,8 @@ const PositionPopupInner = ({
         await DB.Bullpen.Add(Number(status?.controller_id))
         await DB.Bullpen.UpdateTimeSinceInActive(
           Number(status?.controller_id), new Date().getTime().toString()
-        );          
-      } catch(e) {
+        );
+      } catch (e) {
         console.log('popup error: ', e)
       }
     }
@@ -186,9 +190,10 @@ const PositionPopupInner = ({
     ReRender();
   });
 
-  const HandleDecombine = () => {
-    DB.PositionCombinations.Decombine(position.id, date.toSerialized());
-    ReRender();
+  const HandleDecombine = async() => {
+    if(props.combined){
+      await DB.PositionCombinations.Decombine(position.id, date.toSerialized());
+    }
   };
 
   return (
@@ -196,65 +201,63 @@ const PositionPopupInner = ({
       <Container noMargin={true} className={styles.PopupHeading}>
         <div className={styles.OverflowWrapper}>{position.name}</div>
         <div className={styles.OverflowWrapper}>{position.shorthand}</div>
+        {
+          props.combined && (
+            <div className={styles.CombinedMessage}>
+              {'( Combined with '}<strong>{props.combined}</strong>{')'}
+            </div>
+          )
+        }
       </Container>
-      {props.combined ? (
-        <Container className={styles.CombinedMessage}>
-          <div>
-            Combined with <strong>{props.combined}</strong>
-          </div>
-          <Button label="Decombine" onClick={HandleDecombine} />
+      <Fragment>
+        <Container className={styles.PopupInputs} width="70%">
+          <StateTimePicker
+            required
+            label="Time"
+            state={State.time}
+            shouldDisableFuture={isDateToday}
+            setError={TimeErrorState[1]}
+          />
+          <ControllerInput
+            label="Controller"
+            state={State.controller}
+            required
+            include={!props.combined ? [
+              status?.controller_id ?? 0,
+              status?.trainee_controller_id ?? 0,
+            ] : []}
+            exclude={[State.trainee[0]?.id ?? 0]}
+            until={{
+              date: date.toSerialized(),
+            }}
+          />
+          <ControllerInput
+            label="Trainee (Optional)"
+            state={State.trainee}
+            include={!props.combined ? [
+              status?.controller_id ?? 0,
+              status?.trainee_controller_id ?? 0,
+            ] : []}
+            exclude={[State.controller[0]?.id ?? 0]}
+            until={{
+              date: date.toSerialized(),
+            }}
+          />
         </Container>
-      ) : (
-        <Fragment>
-          <Container className={styles.PopupInputs} width="70%">
-            <StateTimePicker
-              required
-              label="Time"
-              state={State.time}
-              shouldDisableFuture={isDateToday}
-              setError={TimeErrorState[1]}
+        <Container className={styles.PopupButtons}>
+          <Button label="Accept" onClick={HandleAdd} />
+          <Container dir="row">
+            <CombinePopup
+              position={position}
+              closePopup={closePopup}
+              date={date}
+              trainee_controller_id={status?.trainee_controller_id}
+              controller_id={status?.controller_id}
             />
-            <ControllerInput
-              label="Controller"
-              state={State.controller}
-              required
-              include={[
-                status?.controller_id ?? 0,
-                status?.trainee_controller_id ?? 0,
-              ]}
-              exclude={[State.trainee[0]?.id ?? 0]}
-              until={{
-                date: date.toSerialized(),
-              }}
-            />
-            <ControllerInput
-              label="Trainee (Optional)"
-              state={State.trainee}
-              include={[
-                status?.controller_id ?? 0,
-                status?.trainee_controller_id ?? 0,
-              ]}
-              exclude={[State.controller[0]?.id ?? 0]}
-              until={{
-                date: date.toSerialized(),
-              }}
-            />
+            <Button label="Closed" width="100%" onClick={HandleClose} />
           </Container>
-          <Container className={styles.PopupButtons}>
-            <Button label="Accept" onClick={HandleAdd} />
-            <Container dir="row">
-              <CombinePopup
-                position={position}
-                closePopup={closePopup}
-                date={date}
-                trainee_controller_id={status?.trainee_controller_id}
-                controller_id={status?.controller_id}
-              />
-              <Button label="Closed" width="100%" onClick={HandleClose} />
-            </Container>
-          </Container>
-        </Fragment>
-      )}
+        </Container>
+      </Fragment>
     </Container>
   );
 };

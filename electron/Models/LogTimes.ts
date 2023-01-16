@@ -1,7 +1,14 @@
 import { Database } from "sql.js"
-import { PositionCombinations } from "."
+import { PositionCombinations, Positions } from "."
 import { Close, Open } from "./Core"
 import { AsObject, assert } from "./Helpers"
+import * as fs from "fs"
+import LocalTime from "../../src/reusable/LocalTime"
+import { app } from "electron"
+import * as path from 'path';
+import * as dayjs from 'dayjs'
+
+export const LOG_HISTORY_HISTORY = path.join(app.getPath("userData"), "logHistory")
 
 interface LogTimes {
     position_id: number
@@ -36,7 +43,7 @@ class LogTimes {
         if (!isClosing) {
             assert(log_time.controller_id !== 0)
         }
-       
+
         const db = await Open()
 
         const positions_associated = AsObject<PositionCombinations>(db.exec(`
@@ -67,10 +74,10 @@ class LogTimes {
                 $trainee_controller_id: log_time.trainee_controller_id,
                 $log_date: log_time.log_date,
                 $start_time: log_time.start_time,
-            })            
+            })
         }
 
-        for (const {position_id} of positions_associated) {
+        for (const { position_id } of positions_associated) {
             stmnt.run({
                 $position_id: position_id,
                 $controller_id: log_time.controller_id,
@@ -85,12 +92,12 @@ class LogTimes {
     }
 
     static async Update(prev_log_time: LogTimes, log_time: LogTimes, canDelete: boolean = false) {
-        
+
         assert(log_time.position_id !== 0)
         if (!canDelete) {
             assert(log_time.controller_id !== 0)
         }
-       
+
         const db = await Open()
 
         const rows = db.run(
@@ -102,13 +109,13 @@ class LogTimes {
             AND log_date = $prev_log_date
             AND start_time = $prev_start_time
             `, {
-                $controller_id: log_time.controller_id,
-                $trainee_controller_id: log_time.trainee_controller_id,
-                $start_time: log_time.start_time,
-                $prev_position_id: prev_log_time.position_id,
-                $prev_log_date: prev_log_time.log_date,
-                $prev_start_time: prev_log_time.start_time,
-            }
+            $controller_id: log_time.controller_id,
+            $trainee_controller_id: log_time.trainee_controller_id,
+            $start_time: log_time.start_time,
+            $prev_position_id: prev_log_time.position_id,
+            $prev_log_date: prev_log_time.log_date,
+            $prev_start_time: prev_log_time.start_time,
+        }
         )
 
         Close(db, true)
@@ -167,8 +174,8 @@ class LogTimes {
             LEFT JOIN controllers AS trainee ON trainee.id = position_status.trainee_controller_id
             GROUP BY position_id
             `, {
-                $log_date: log_date
-            }
+            $log_date: log_date
+        }
         )
         return AsObject<LogTimes & {
             controller_initials: string
@@ -176,7 +183,7 @@ class LogTimes {
         }>(result)
     }
     static async GetAllPositionsStatusValues(log_date: string, until_time?: number) {
-        console.log('log_date:', log_date, " until_time:", until_time)
+        // console.log('log_date:', log_date, " until_time:", until_time)
         const db = await Open()
 
         const result = db.exec(
@@ -194,8 +201,8 @@ class LogTimes {
             LEFT JOIN controllers ON controllers.id = position_status.controller_id
             LEFT JOIN controllers AS trainee ON trainee.id = position_status.trainee_controller_id
             `, {
-                $log_date: log_date
-            }
+            $log_date: log_date
+        }
         )
         return AsObject<LogTimes & {
             controller_initials: string
@@ -219,11 +226,11 @@ class LogTimes {
             AND log_date = $log_date
             ORDER BY start_time ASC
             `, {
-                $position_id: position_id,
-                $log_date: log_date
-            }
+            $position_id: position_id,
+            $log_date: log_date
+        }
         )
-                        
+
         Close(db, false)
 
         return AsObject<LogTimes & {
@@ -264,7 +271,7 @@ class LogTimes {
         ) AS duration
         GROUP BY controller_id, position_id
         `
-        
+
         const result = db.exec(sql, {
             $start_date: start_date,
             $end_date: end_date
@@ -279,6 +286,61 @@ class LogTimes {
         }>(result)
 
         return reports
+    }
+
+    static async SaveDailyLog(data: { position: Positions, logtimes: any }[], log_date: string) {
+        let resObj = {
+            success: false,
+            msg: ''
+        }
+
+        try {
+            if (!fs.existsSync(LOG_HISTORY_HISTORY)) {
+                fs.mkdirSync(LOG_HISTORY_HISTORY);
+            }
+
+            if (fs.existsSync(LOG_HISTORY_HISTORY)) {
+                let nDate: Date = new Date()
+                const dateStr: string = '' + (nDate.getFullYear()) + '-' + (nDate.getMonth() + 1) + '-' + (nDate.getDate())
+                resObj.msg = dateStr
+                const filename = path.join(LOG_HISTORY_HISTORY, dateStr + '.csv')
+                //  Build csv string... 
+                const nextLine = '\r\n'
+                let writeString = ''
+
+                writeString += 'FACILITY,' + ', ' + nextLine
+                writeString += 'DATE,' + dayjs(new Date(dateStr)).format('DDMMMYYYY') + ', ' + nextLine + nextLine
+
+                writeString += 'POSTION, ON, CONTROLLER, TRAINEE' + nextLine
+
+                data.forEach(item => {
+                    let position_name = item.position.name
+                    let logtimes = item.logtimes.result
+                    if (logtimes.length > 0) {
+                        logtimes.forEach((log: LogTimes & { controller_initials: string, trainee_initials: string }) => {
+                            let log_time = LocalTime.fromSerialized(log.start_time).convertToUTC().formatToWithoutZ()
+                            if (log.controller_id) {
+                                writeString += `${position_name}, ${log_time}, ${log.controller_initials}, ${log.trainee_initials ?? '---'}, ${nextLine}`
+                            } else {
+                                writeString += `${position_name}, ${log_time}, ${'---'}, ${'---'}, ${nextLine}`
+                            }
+                            position_name = ''
+                        })
+                    } else {
+                        writeString += `${position_name},  ${nextLine}`
+                    }
+                })
+
+                writeString += nextLine + 'Saved at, ' + new Date().toString()
+
+                fs.writeFileSync(filename, writeString) 
+                resObj.success = true 
+                return resObj
+            }
+        } catch (err) {
+            console.log('err-catch: ', err)
+        }
+        return resObj
     }
 }
 

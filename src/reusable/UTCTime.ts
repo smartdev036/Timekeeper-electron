@@ -47,6 +47,10 @@ class UTCTime {
         const withZ = true
         return `${MinDigits(2, this.hour)}${MinDigits(2, this.minute)}${withZ ? " Z" : ""}`
     }
+    formatToWithoutZ() {
+        const withZ = false
+        return `${MinDigits(2, this.hour)}${MinDigits(2, this.minute)}${withZ ? " Z" : ""}`
+    }
 
     mergeDate(date: UTCDate) {
         const d = new Date()

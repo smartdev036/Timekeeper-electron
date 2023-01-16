@@ -1,3 +1,5 @@
+import { Positions } from ".";
+export declare const LOG_HISTORY_HISTORY: string;
 interface LogTimes {
     position_id: number;
     controller_id: number;
@@ -33,5 +35,12 @@ declare class LogTimes {
         position_id: number;
         duration: number;
     }[]>;
+    static SaveDailyLog(data: {
+        position: Positions;
+        logtimes: any;
+    }[], log_date: string): Promise<{
+        success: boolean;
+        msg: string;
+    }>;
 }
 export default LogTimes;
