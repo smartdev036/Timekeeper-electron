@@ -83,7 +83,6 @@ const PositionPopupInner = ({
   };
 
   const HandleAdd = WrapPositionAdding(async () => {
-    await HandleDecombine()
 
     if (State.time[0] === null) return;
     if (State.controller[0] === null) return;
@@ -137,6 +136,9 @@ const PositionPopupInner = ({
     }
     // DB.Bullpen.UpdateTimeSinceInActive(Number(State?.trainee[0]?.id), "0");
 
+    await DB.PositionCombinations.insert_tbl_pos(position.id , position.id, date.toSerialized())
+    await HandleDecombine()
+
     await DB.LogTimes.Add({
       position_id: position.id,
       controller_id: State.controller[0].id,
@@ -150,7 +152,6 @@ const PositionPopupInner = ({
   });
 
   const HandleClose = WrapPositionAdding(async () => {
-    await HandleDecombine()
 
     if (State.time[0] === null) {
       return setTimeout(() => ElectronAlert("Set close time."));
@@ -180,6 +181,9 @@ const PositionPopupInner = ({
         console.log('popup error: ', e)
       }
     }
+
+    await DB.PositionCombinations.insert_tbl_pos(position.id , position.id, date.toSerialized())
+    await HandleDecombine()
 
     await DB.LogTimes.Close({
       position_id: position.id,

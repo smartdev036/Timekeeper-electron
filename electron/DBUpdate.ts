@@ -26,6 +26,18 @@ const DBUpdate = async () => {
         `)
         console.log("'combined_center' created")
     }
+
+    try {
+        db.exec(`CREATE TABLE IF NOT EXISTS tbl_pos_combined_integration  (
+            id int(0) NOT NULL,
+            center_id int(0) NULL,
+            combined_id int(0) NULL,
+            log_date date NULL,
+            PRIMARY KEY (id, center_id, combined_id, log_date)
+          )`)
+    } catch (err) {
+        console.log('new tbl_pos_combined_integration creation error')
+    }
     Close(db, true)
 
 }

@@ -70,4 +70,12 @@ CREATE TABLE combined_center (
     PRIMARY KEY (id, log_date),
     UNIQUE (position_id)
 );
+
+CREATE TABLE IF NOT EXISTS tbl_pos_combined_integration  (
+  id int(0) NOT NULL,
+  center_id int(0) NULL,
+  combined_id int(0) NULL,
+  log_date date NULL,
+  PRIMARY KEY (id, center_id, combined_id, log_date)
+)
 `

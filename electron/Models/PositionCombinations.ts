@@ -15,6 +15,110 @@ interface CombinedCenter {
 }
 
 class PositionCombinations {
+
+    static async getMaxId() {
+        const db = await Open()
+        const result = AsObject<any>(db.exec(
+            `select max(id) as id from tbl_pos_combined_integration`
+        ))
+        return (result.length) ? result[0].id + 1 : 1
+    }
+
+    static async insert_tbl_pos($center_id: number, $combined_id: number, $log_date: string) {
+        const db = await Open()
+        const $maxId = await PositionCombinations.getMaxId()
+        const result = AsObject<any>(db.exec(
+            `
+            INSERT INTO tbl_pos_combined_integration('id', 'center_id', 'combined_id', 'log_date') 
+            VALUES ($maxId, $center_id, $combined_id, $log_date);
+        `, {
+            $maxId,
+            $center_id,
+            $combined_id,
+            $log_date
+        }
+        ))
+        Close(db, true)
+        return result
+    }
+
+
+    static async delete_tbl_pos($deleteId: number) {
+        const db = await Open()
+        const result = AsObject<any>(db.exec(
+            `
+            DELETE from tbl_pos_combined_integration
+            where 'id' = $deleteId;
+        `, {
+            $deleteId
+        }
+        ))
+        Close(db, true)
+        return result
+    }
+
+    static nFindLastIndex(arr: any[], item: any) {
+        let id = [...arr].reverse().findIndex(a => a?.combined_id === item)
+        return id === -1 ? -1 : (arr.length - 1 - id)
+    }
+
+    static async MapPositionCombined(positionMap: any[]) {
+        let resArr: any[] = []
+        let newId = 0
+        positionMap.forEach((item: any, idx: number) => {
+            let cid = item.center_id
+            let pid = item.combined_id
+            // let csh = item.center_sh
+            // let psh = item.combined_sh
+            console.log('lastIndex: ', item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
+            if (resArr.filter(item => item.leaf_id == pid).length > 0) return
+            if (idx !== PositionCombinations.nFindLastIndex(positionMap, pid)) return
+
+            while (true) {
+                let lastIndex = PositionCombinations.nFindLastIndex(positionMap, cid)
+                if (lastIndex == -1) {
+                    break
+                }
+                console.log('lastIndex: ', lastIndex, item, cid, positionMap[lastIndex].center_id)
+                cid = positionMap[lastIndex].center_id
+                pid = positionMap[lastIndex].combined_id
+                if (pid === cid) {
+                    break
+                }
+                // csh = positionMap[lastIndex].center_sh
+                // psh = positionMap[lastIndex].combined_sh
+            }
+            newId += 1
+            resArr.push({
+                id: newId,
+                center_id: cid,
+                leaf_id: item.combined_id,
+                // center_sh: csh,
+                // leaf_sh: psh,
+            })
+        })
+        return resArr
+
+    }
+
+    static async TestDBCall($log_date: string) {
+        const db = await Open()
+        const foundCombined = AsObject<any>(db.exec(
+            `          
+            SELECT *
+            from tbl_pos_combined_integration
+            where log_date=$log_date
+            `, {
+            $log_date
+        }
+        ))
+
+        let result = PositionCombinations.MapPositionCombined(foundCombined)
+        return result
+        // return foundCombined
+
+    }
+
     static __public_CleanupCombine(...args: Parameters<typeof PositionCombinations["CleanupCombine"]>) {
         return PositionCombinations.CleanupCombine(...args)
     }
@@ -28,8 +132,8 @@ class PositionCombinations {
                 HAVING COUNT(*) < 2
             );
             `, {
-                $log_date
-            }
+            $log_date
+        }
         )
         db.run(
             `
@@ -38,8 +142,8 @@ class PositionCombinations {
                 WHERE log_date = $log_date
             );
             `, {
-                $log_date
-            }
+            $log_date
+        }
         )
     }
 
@@ -63,17 +167,22 @@ class PositionCombinations {
 
         const $log_date = log_date ?? new LocalDate().toSerialized()
 
+
+        // BEGIN-New Update(Smart)
+        await PositionCombinations.insert_tbl_pos(position_B, position_A, $log_date)
+        // END-New Update(Smart)
+
         // When A is combined with another position:
         // Not possible as it should only have the decombine option.
-        
+
         // When another position is combining with A:
         // A, and all positions with it will be assigned the same log as B.
         // All positions will now be combined with B.
-        
+
         // When B is combined with another position:
         // A, and all associated positions will be assigned the same log as B (same as the other position).
         // All positions will now be assigned to the other position.
-        
+
         // When other positions are combined with B:
         // A, and all associated positions will be assigned the same log as B.
         // All positions will now be assigned to B.
@@ -88,10 +197,10 @@ class PositionCombinations {
             WHERE position_id IN ($position_A, $position_B)
             AND log_date = $log_date
             `, {
-                $position_A: position_A,
-                $position_B: position_B,
-                $log_date
-            }
+            $position_A: position_A,
+            $position_B: position_B,
+            $log_date
+        }
         ))
 
         // > When B is empty:
@@ -116,7 +225,7 @@ class PositionCombinations {
             throw new Error("position_B is empty")
         }
         console.log("foundCombined", foundCombined);
-        
+
         const id = (() => {
             if (foundCombined.length === 0) {
                 console.log("foundCombined.length === 0")
@@ -126,7 +235,7 @@ class PositionCombinations {
 
                 // We know B is not empty, and that neither are combined.
                 // So this condition matches.
-                
+
                 // If Neither are combined
                 // -> Insert position_A with new combination id
                 db.run(`
@@ -156,14 +265,14 @@ class PositionCombinations {
                 // Get Max() i.e: position A and B's new id, and return it
                 const id = db.exec(
                     "SELECT MAX(id) FROM positions_combined WHERE log_date = $log_date;",
-                    {$log_date}
+                    { $log_date }
                 )[0].values[0][0] as number;
 
                 // Now, both position A and B share the combination id {id}
 
                 // A should be assigned the same log as B.
 
-                ;(db.run(`
+                ; (db.run(`
                     INSERT INTO log_times
                     SELECT * FROM (
                         SELECT $position_A, controller_id, trainee_controller_id, log_date, $start_time AS st
@@ -205,11 +314,11 @@ class PositionCombinations {
                     `, {
                         $id: foundCombined[0].id,
                         $log_date
-                    })).map(({position_id}) => position_id)
+                    })).map(({ position_id }) => position_id)
 
 
                     // Generate new ID for position B
-                    
+
                     db.run(`
                     INSERT INTO positions_combined (id, position_id, log_date)
                     VALUES (COALESCE((SELECT MAX(id) + 1 FROM positions_combined WHERE log_date = $log_date), 1), $position_B, $log_date);
@@ -233,14 +342,14 @@ class PositionCombinations {
                     // We're now using this new ID, that B, A, and all positions combined with A use.
                     const id = db.exec(
                         "SELECT MAX(id) FROM positions_combined WHERE log_date = $log_date;",
-                        {$log_date}
+                        { $log_date }
                     )[0].values[0][0] as number;
 
 
                     // Now updating logs for A, and all positions that were combined with it.
                     const $start_time = new LocalTime().toSerialized()
                     for (const position_id of positionsCombinedWithA) {
-                        ;(db.run(`
+                        ; (db.run(`
                             INSERT INTO log_times
                             SELECT * FROM (
                                 SELECT $position_to_be_updated, controller_id, trainee_controller_id, log_date, $start_time AS st
@@ -261,7 +370,7 @@ class PositionCombinations {
                     // All positions combined with A, and A itself have now been combined with B, with B being the center.
                     PositionCombinations.UpsertCenter(db, id, position_B, $log_date)
 
-                    return id    
+                    return id
                 } else if (foundCombined[0].position_id === position_B) {
                     // This is automatically setting the center, as position_B's group should have a center already.
                     // Position A is being assigned to the same group as B.
@@ -294,8 +403,8 @@ class PositionCombinations {
                         $log_date
                     })
 
-                    // Now A has the same log as B
-                    ;(db.run(`
+                        // Now A has the same log as B
+                        ; (db.run(`
                         INSERT INTO log_times
                         SELECT * FROM (
                             SELECT $position_A, controller_id, trainee_controller_id, log_date, $start_time AS st
@@ -306,12 +415,12 @@ class PositionCombinations {
                             LIMIT 1
                         )
                     `, {
-                        $position_A: position_A,
-                        $position_B: position_B,
-                        $log_date,
-                        $start_time: new LocalTime().toSerialized()
+                            $position_A: position_A,
+                            $position_B: position_B,
+                            $log_date,
+                            $start_time: new LocalTime().toSerialized()
 
-                    }))
+                        }))
 
                     return positionB_ID
 
@@ -340,7 +449,7 @@ class PositionCombinations {
                     `, {
                         $id: position_A_id,
                         $log_date
-                    })).map(({position_id}) => position_id)
+                    })).map(({ position_id }) => position_id)
 
 
                     // Update position_A with the position_B id
@@ -359,7 +468,7 @@ class PositionCombinations {
                     const $start_time = new LocalTime().toSerialized()
 
                     for (const position_id of positionsCombinedWithA) {
-                        ;(db.run(`
+                        ; (db.run(`
                             INSERT INTO log_times
                             SELECT * FROM (
                                 SELECT $position_to_be_updated, controller_id, trainee_controller_id, log_date, $start_time AS st
@@ -387,7 +496,7 @@ class PositionCombinations {
 
 
         Close(db, true)
-        
+
         return id
     }
 
@@ -400,7 +509,7 @@ class PositionCombinations {
         SELECT * FROM positions_combined
         WHERE log_date = $log_date
         ORDER BY position_id ASC
-        `, {$log_date}))
+        `, { $log_date }))
 
         const combinations: {
             [id: number]: number[]
@@ -428,19 +537,65 @@ class PositionCombinations {
         assert(position_id !== 0)
 
         const $log_date = log_date ?? new LocalDate().toSerialized()
-
         const db = await Open()
-        db.run(`
-            DELETE FROM positions_combined
-            WHERE position_id = $position_id
-            AND log_date = $log_date
-        `, {
+
+        // Make position_id to center in positions_combined 
+        // If any position is combined to position_id, doesn't effect to CleanupCombine
+        // If it is the only position, it removed by CleanupCombine 
+
+        // Update all positions_combined, combined_center to final destination from 
+
+        const position_rows = AsObject<{
+            id: number,
+            position_id: number,
+            log_date: string
+        }>(db.exec(
+            `
+                SELECT id, position_id,log_date FROM combined_center
+                WHERE position_id = $position_id
+                AND log_date = $log_date
+            `, {
             $position_id: position_id,
-            $log_date
+            $log_date: $log_date
+        }
+        ));
+        let center_pos_id: number = 0
+        if (position_rows.length == 0) {
+            center_pos_id = AsObject<{
+                maxId: number
+            }>(db.exec(`
+            SELECT MAX(id) + 1 as maxId FROM positions_combined WHERE log_date = $log_date
+            `, { $log_date: $log_date }))[0].maxId
+
+            // Add new Position_Center
+            PositionCombinations.UpsertCenter(db, center_pos_id, position_id, $log_date)
+
+        } else {
+            center_pos_id = position_rows[0].id
+            // Update new Position_Center
+            PositionCombinations.UpsertCenter(db, center_pos_id, position_id, $log_date)
+        }
+
+        let reMap = await PositionCombinations.TestDBCall($log_date)
+        reMap.forEach(item => {
+            if (item.center_id === position_id) {
+                db.run(`
+                UPDATE positions_combined 
+                SET id=$center_pos_id 
+                WHERE position_id = $position_id
+                and log_date = $log_date
+                `, {
+                    $center_pos_id: center_pos_id,
+                    $position_id: item.leaf_id,
+                    $log_date: $log_date
+                })
+            }
         })
-        
+
+        console.log('position_rows: ', position_rows, center_pos_id, reMap)
+
         PositionCombinations.CleanupCombine(db, $log_date)
-        
+
         Close(db, true)
     }
 
@@ -453,7 +608,7 @@ class PositionCombinations {
         SELECT * FROM combined_center
         WHERE log_date = $log_date
         ORDER BY position_id ASC
-        `, {$log_date}))
+        `, { $log_date }))
 
         const id_centers: {
             [id: number]: number
@@ -465,7 +620,7 @@ class PositionCombinations {
         SELECT * FROM positions_combined
         WHERE log_date = $log_date
         ORDER BY position_id ASC
-        `, {$log_date})).map(row => {
+        `, { $log_date })).map(row => {
             const center: number | undefined = id_centers[row.id]
             return [row.position_id, center]
         }))
@@ -473,7 +628,7 @@ class PositionCombinations {
         Close(db, false)
 
         return position_centers
-        
+
     }
 }
 
