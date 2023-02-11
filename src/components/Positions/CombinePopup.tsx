@@ -14,6 +14,7 @@ interface CombinePopupProps {
   date: LocalDate;
   trainee_controller_id?: number;
   controller_id?: number;
+  start_time: number;
 }
 
 const CombinePopup = (props: CombinePopupProps) => {
@@ -25,12 +26,14 @@ const CombinePopup = (props: CombinePopupProps) => {
   console.log(props);
 
   const HandleCombine = async (position: Positions | null) => {
+    console.log('position: ', position, props)
     if (position === null) return;
     try {
       await DB.PositionCombinations.Combine(
         props.position.id,
         position.id,
-        props.date.toSerialized()
+        props.date.toSerialized(),
+        props.start_time,
       );
       DB.Bullpen.UpdateTimeSinceInActive(
         Number(props?.controller_id),

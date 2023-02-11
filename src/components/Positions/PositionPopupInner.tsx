@@ -257,6 +257,7 @@ const PositionPopupInner = ({
               date={date}
               trainee_controller_id={status?.trainee_controller_id}
               controller_id={status?.controller_id}
+              start_time={State.time[0]?.toSerialized() ?? new LocalTime().toSerialized()} 
             />
             <Button label="Closed" width="100%" onClick={HandleClose} />
           </Container>

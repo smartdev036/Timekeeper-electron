@@ -13,7 +13,7 @@ declare class PositionCombinations {
     private static CleanupCombine;
     static __public_UpsertCenter(...args: Parameters<typeof PositionCombinations["UpsertCenter"]>): Promise<void>;
     private static UpsertCenter;
-    static Combine(position_A: number, position_B: number, log_date?: string): Promise<number>;
+    static Combine(position_A: number, position_B: number, log_date?: string, start_time?: number): Promise<number>;
     static GetCombinations(log_date?: string): Promise<{
         [position_id: number]: number[];
     }>;

@@ -161,7 +161,7 @@ class PositionCombinations {
         })
     }
 
-    static async Combine(position_A: number, position_B: number, log_date?: string) {
+    static async Combine(position_A: number, position_B: number, log_date?: string, start_time?: number) {
         // position_A is being combined with position_b, so it should be the center
         const db = await Open()
 
@@ -170,6 +170,7 @@ class PositionCombinations {
 
         // BEGIN-New Update(Smart)
         await PositionCombinations.insert_tbl_pos(position_B, position_A, $log_date)
+        const $start_time = start_time ?? new LocalTime().toSerialized()
         // END-New Update(Smart)
 
         // When A is combined with another position:
@@ -286,7 +287,7 @@ class PositionCombinations {
                     $position_A: position_A,
                     $position_B: position_B,
                     $log_date,
-                    $start_time: new LocalTime().toSerialized(),
+                    $start_time: $start_time,
                 }))
 
                 PositionCombinations.__public_UpsertCenter(db, id, position_B, $log_date)
@@ -347,7 +348,7 @@ class PositionCombinations {
 
 
                     // Now updating logs for A, and all positions that were combined with it.
-                    const $start_time = new LocalTime().toSerialized()
+                    // const $start_time = new LocalTime().toSerialized()
                     for (const position_id of positionsCombinedWithA) {
                         ; (db.run(`
                             INSERT INTO log_times
@@ -418,8 +419,8 @@ class PositionCombinations {
                             $position_A: position_A,
                             $position_B: position_B,
                             $log_date,
-                            $start_time: new LocalTime().toSerialized()
-
+                            // $start_time: new LocalTime().toSerialized()
+                            $start_time,
                         }))
 
                     return positionB_ID
@@ -465,7 +466,7 @@ class PositionCombinations {
                     // Now position A, and positions combined with it share a combination with B.
 
                     // Now updating logs for A, and all positions that were combined with it.
-                    const $start_time = new LocalTime().toSerialized()
+                    // const $start_time = new LocalTime().toSerialized()
 
                     for (const position_id of positionsCombinedWithA) {
                         ; (db.run(`
