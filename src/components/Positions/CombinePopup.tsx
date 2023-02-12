@@ -29,6 +29,7 @@ const CombinePopup = (props: CombinePopupProps) => {
     console.log('position: ', position, props)
     if (position === null) return;
     try {
+      await DB.PositionCombinations.Decombine(props.position.id, props.date.toSerialized() )
       await DB.PositionCombinations.Combine(
         props.position.id,
         position.id,

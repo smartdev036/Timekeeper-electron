@@ -7,8 +7,8 @@ declare class PositionCombinations {
     static insert_tbl_pos($center_id: number, $combined_id: number, $log_date: string): Promise<any[]>;
     static delete_tbl_pos($deleteId: number): Promise<any[]>;
     static nFindLastIndex(arr: any[], item: any): number;
-    static MapPositionCombined(positionMap: any[]): Promise<any[]>;
-    static TestDBCall($log_date: string): Promise<any[]>;
+    static MapPositionCombined(positionMap: any[], position_id: number): Promise<any[]>;
+    static TestDBCall($log_date: string, position_id: number): Promise<any[]>;
     static __public_CleanupCombine(...args: Parameters<typeof PositionCombinations["CleanupCombine"]>): Promise<void>;
     private static CleanupCombine;
     static __public_UpsertCenter(...args: Parameters<typeof PositionCombinations["UpsertCenter"]>): Promise<void>;

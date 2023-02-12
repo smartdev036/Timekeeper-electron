@@ -62,20 +62,29 @@ class PositionCombinations {
         return id === -1 ? -1 : (arr.length - 1 - id)
     }
 
-    static async MapPositionCombined(positionMap: any[]) {
+    static async MapPositionCombined(positionMap: any[], position_id: number) {
         let resArr: any[] = []
         let newId = 0
         positionMap.forEach((item: any, idx: number) => {
             let cid = item.center_id
             let pid = item.combined_id
+
+            let isIncludeDecombinePosition = 0
+
             // let csh = item.center_sh
             // let psh = item.combined_sh
             console.log('lastIndex: ', item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
             if (resArr.filter(item => item.leaf_id == pid).length > 0) return
             if (idx !== PositionCombinations.nFindLastIndex(positionMap, pid)) return
 
+
             while (true) {
                 let lastIndex = PositionCombinations.nFindLastIndex(positionMap, cid)
+
+                if (PositionCombinations.nFindLastIndex(positionMap, pid) === position_id) {
+                    isIncludeDecombinePosition = 1
+                }
+
                 if (lastIndex == -1) {
                     break
                 }
@@ -88,20 +97,23 @@ class PositionCombinations {
                 // csh = positionMap[lastIndex].center_sh
                 // psh = positionMap[lastIndex].combined_sh
             }
-            newId += 1
-            resArr.push({
-                id: newId,
-                center_id: cid,
-                leaf_id: item.combined_id,
-                // center_sh: csh,
-                // leaf_sh: psh,
-            })
+
+            if (isIncludeDecombinePosition === 1) {
+                newId += 1
+                resArr.push({
+                    id: newId,
+                    center_id: cid,
+                    leaf_id: item.combined_id,
+                    // center_sh: csh,
+                    // leaf_sh: psh,
+                })
+            }
         })
         return resArr
 
     }
 
-    static async TestDBCall($log_date: string) {
+    static async TestDBCall($log_date: string, position_id: number) {
         const db = await Open()
         const foundCombined = AsObject<any>(db.exec(
             `          
@@ -113,7 +125,7 @@ class PositionCombinations {
         }
         ))
 
-        let result = PositionCombinations.MapPositionCombined(foundCombined)
+        let result = PositionCombinations.MapPositionCombined(foundCombined, position_id)
         return result
         // return foundCombined
 
@@ -168,7 +180,7 @@ class PositionCombinations {
         const $log_date = log_date ?? new LocalDate().toSerialized()
 
 
-        // BEGIN-New Update(Smart)
+        // BEGIN-New Update(Smart)    (B -> A)
         await PositionCombinations.insert_tbl_pos(position_B, position_A, $log_date)
         const $start_time = start_time ?? new LocalTime().toSerialized()
         // END-New Update(Smart)
@@ -577,23 +589,35 @@ class PositionCombinations {
             PositionCombinations.UpsertCenter(db, center_pos_id, position_id, $log_date)
         }
 
-        let reMap = await PositionCombinations.TestDBCall($log_date)
+        // Add children to position_combined
+        // reMap is a array that includes only children, not parents
+        let reMap = await PositionCombinations.TestDBCall($log_date, position_id)
         reMap.forEach(item => {
-            if (item.center_id === position_id) {
-                db.run(`
+            db.run(`
                 UPDATE positions_combined 
                 SET id=$center_pos_id 
                 WHERE position_id = $position_id
                 and log_date = $log_date
                 `, {
-                    $center_pos_id: center_pos_id,
-                    $position_id: item.leaf_id,
-                    $log_date: $log_date
-                })
-            }
+                $center_pos_id: center_pos_id,
+                $position_id: item.leaf_id,
+                $log_date: $log_date
+            })
         })
 
-        console.log('position_rows: ', position_rows, center_pos_id, reMap)
+        // Add self to position_combined
+        db.run(`
+            UPDATE positions_combined 
+            SET id=$center_pos_id 
+            WHERE position_id = $position_id
+            and log_date = $log_date
+            `, {
+            $center_pos_id: center_pos_id,
+            $position_id: position_id,
+            $log_date: $log_date
+        })
+
+        console.log('POSITION: REMAP: ', position_rows, center_pos_id, position_id, reMap)
 
         PositionCombinations.CleanupCombine(db, $log_date)
 

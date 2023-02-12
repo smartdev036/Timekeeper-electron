@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import DB, { ElectronAlert, ElectronConfirm } from "../../DB";
 import { LogTimes, Positions } from "../../db-typings/electron/Models";
 import Button from "../../inputs/Button";
@@ -45,6 +45,12 @@ const PositionPopupInner = ({
     controller: useState<OptionType | null>(null),
     trainee: useState<OptionType | null>(null),
   };
+
+  useEffect(() => {
+    (async() =>
+    console.log('useEffect: ', await DB.PositionCombinations.TestDBCall(new LocalDate().toSerialized(), position.id))
+    )()
+  }, [])
 
   const TimeErrorState = useState<string | null>(null);
 
