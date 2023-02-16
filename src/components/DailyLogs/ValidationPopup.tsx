@@ -12,6 +12,7 @@ import EditLog from "./EditLog"
 import ValidationStatus from "./ValidationStatus"
 import styles from "./ValidationPopup.module.scss"
 import LocalTime from "../../reusable/LocalTime"
+import InsertLog from "./InsertLog"
 
 interface ValidationPopupInnerProps {
     date: LocalDate
@@ -37,6 +38,10 @@ const ValidationPopupInner = ({position, ...props}: ValidationPopupInnerProps) =
     }) => {
         await DB.LogTimes.Delete(log.position_id, log.log_date, log.start_time)
         ReRender()
+    }
+
+    const handleInsert = async() => {
+        ReRender() 
     }
 
     return (
@@ -78,6 +83,7 @@ const ValidationPopupInner = ({position, ...props}: ValidationPopupInnerProps) =
             {logs_value?.result.length === 0 && <Container>No entries found.</Container>}
             <Container dir="row">
                 <Button push="right" label="Cancel" onClick={props.closePopup} />
+                <InsertLog position={position} trigger={<Button label="Insert"/>} log_date={props.date.toSerialized()} />
                 <Button label="Validate" onClick={handleValidate} />
             </Container>
         </Container>
