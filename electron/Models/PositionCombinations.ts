@@ -88,7 +88,7 @@ class PositionCombinations {
                 if (lastIndex == -1) {
                     break
                 }
-                console.log('lastIndex: ', lastIndex, item, cid, positionMap[lastIndex].center_id)
+                console.log('lastIndex-detail: ', lastIndex, item, cid, positionMap[lastIndex].center_id)
                 cid = positionMap[lastIndex].center_id
                 pid = positionMap[lastIndex].combined_id
                 if (pid === cid) {
@@ -124,6 +124,8 @@ class PositionCombinations {
             $log_date
         }
         ))
+
+        console.log('found-combined: ', foundCombined, position_id)
 
         let result = PositionCombinations.MapPositionCombined(foundCombined, position_id)
         return result

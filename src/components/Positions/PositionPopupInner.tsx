@@ -48,7 +48,7 @@ const PositionPopupInner = ({
 
   useEffect(() => {
     (async() =>
-    console.log('useEffect: ', await DB.PositionCombinations.TestDBCall(new LocalDate().toSerialized(), position.id))
+    console.log('useEffect: ', await (await DB.PositionCombinations.TestDBCall(new LocalDate().toSerialized(), position.id)).result)
     )()
   }, [])
 
