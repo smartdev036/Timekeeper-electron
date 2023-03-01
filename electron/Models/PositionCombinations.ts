@@ -74,18 +74,24 @@ class PositionCombinations {
             // let csh = item.center_sh
             // let psh = item.combined_sh
             console.log('lastIndex: ', idx,  item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
-            if (resArr.filter(item => item.leaf_id == pid).length > 0) return
-            // if (idx !== PositionCombinations.nFindLastIndex(positionMap, pid)) return
-
+            
+            // If one is already added per PID
+            if (resArr.filter(it => it.leaf_id == pid).length > 0) return
+            // If the current row is not useful because the later row is the nFindLast Row
+            if (idx !== PositionCombinations.nFindLastIndex(positionMap, pid)) return
 
             while (true) {
-                let lastIndex = PositionCombinations.nFindLastIndex(positionMap, cid)
-
                 // If the next center is the current Position
-                if ( positionMap[PositionCombinations.nFindLastIndex(positionMap, pid)].center_id === position_id) {
-                    isIncludeDecombinePosition = 1
+                let currentIndex = PositionCombinations.nFindLastIndex(positionMap, pid)
+                if ( positionMap[currentIndex].center_id === position_id) {
+                    isIncludeDecombinePosition = 1                    
+                    cid = positionMap[currentIndex].center_id
+                    pid = positionMap[currentIndex].combined_id
+                    break
                 }
 
+                // Find the next direction row 
+                let lastIndex = PositionCombinations.nFindLastIndex(positionMap, cid)
                 if (lastIndex == -1) {
                     break
                 }
