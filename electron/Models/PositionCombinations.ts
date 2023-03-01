@@ -73,15 +73,16 @@ class PositionCombinations {
 
             // let csh = item.center_sh
             // let psh = item.combined_sh
-            console.log('lastIndex: ', item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
+            console.log('lastIndex: ', idx,  item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
             if (resArr.filter(item => item.leaf_id == pid).length > 0) return
-            if (idx !== PositionCombinations.nFindLastIndex(positionMap, pid)) return
+            // if (idx !== PositionCombinations.nFindLastIndex(positionMap, pid)) return
 
 
             while (true) {
                 let lastIndex = PositionCombinations.nFindLastIndex(positionMap, cid)
 
-                if (PositionCombinations.nFindLastIndex(positionMap, pid) === position_id) {
+                // If the next center is the current Position
+                if ( positionMap[PositionCombinations.nFindLastIndex(positionMap, pid)].center_id === position_id) {
                     isIncludeDecombinePosition = 1
                 }
 
