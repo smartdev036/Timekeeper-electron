@@ -25,7 +25,7 @@ const DB = new Proxy({}, {
         return new Proxy({}, {
             get: (_, func: string) => {
                 return (...args: any[]) => {
-                    console.log("call =>", `${module}.${func}`, args)
+                    // console.log("call =>", `${module}.${func}`, args)
                     return ipc.invoke("call", `${module}.${func}`, ...args)
                 }
             }

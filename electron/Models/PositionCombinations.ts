@@ -73,7 +73,7 @@ class PositionCombinations {
 
             // let csh = item.center_sh
             // let psh = item.combined_sh
-            console.log('lastIndex: ', idx,  item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
+            // console.log('lastIndex: ', idx,  item, PositionCombinations.nFindLastIndex(positionMap, pid), PositionCombinations.nFindLastIndex(positionMap, cid))
             
             // If one is already added per PID
             if (resArr.filter(it => it.leaf_id == pid).length > 0) return
@@ -95,7 +95,7 @@ class PositionCombinations {
                 if (lastIndex == -1) {
                     break
                 }
-                console.log('lastIndex-detail: ', lastIndex, item, cid, positionMap[lastIndex].center_id)
+                // console.log('lastIndex-detail: ', lastIndex, item, cid, positionMap[lastIndex].center_id)
                 cid = positionMap[lastIndex].center_id
                 pid = positionMap[lastIndex].combined_id
                 if (pid === cid) {
@@ -132,7 +132,7 @@ class PositionCombinations {
         }
         ))
 
-        console.log('found-combined: ', foundCombined, position_id)
+        // console.log('found-combined: ', foundCombined, position_id)
 
         let result = PositionCombinations.MapPositionCombined(foundCombined, position_id)
         return result
@@ -246,7 +246,7 @@ class PositionCombinations {
         if (isPositionBEmpty) {
             throw new Error("position_B is empty")
         }
-        console.log("foundCombined", foundCombined);
+        // console.log("foundCombined", foundCombined);
 
         const id = (() => {
             if (foundCombined.length === 0) {
@@ -626,7 +626,7 @@ class PositionCombinations {
             $log_date: $log_date
         })
 
-        console.log('POSITION: REMAP: ', position_rows, center_pos_id, position_id, reMap)
+        // console.log('POSITION: REMAP: ', position_rows, center_pos_id, position_id, reMap)
 
         PositionCombinations.CleanupCombine(db, $log_date)
 

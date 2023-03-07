@@ -23,10 +23,10 @@ const CombinePopup = (props: CombinePopupProps) => {
     () => DB.Positions.GetAll(),
     [counter]
   );
-  console.log(props);
+  // console.log(props);
 
   const HandleCombine = async (position: Positions | null) => {
-    console.log('position: ', position, props)
+    // console.log('position: ', position, props)
     if (position === null) return;
     try {
       await DB.PositionCombinations.Decombine(props.position.id, props.date.toSerialized() )

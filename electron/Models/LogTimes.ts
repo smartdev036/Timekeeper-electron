@@ -155,6 +155,69 @@ class LogTimes {
         }, true)
     }
 
+
+    static async GetPositionByControllerId(controller_id: number, log_date: string, until_time?: number) {
+        const db = await Open()
+
+        // Just copied command, so can be optimized later. 
+        const result = db.exec(
+            `
+            SELECT
+                position_status.*,
+                controllers.initials AS controller_initials,
+                trainee.initials AS trainee_initials
+            FROM (
+                SELECT * from log_times
+                WHERE log_date = $log_date
+                ${typeof until_time === "undefined" ? "" : `AND start_time <= ${until_time}`}
+                ORDER BY position_id ASC, start_time DESC
+            ) AS position_status
+            LEFT JOIN controllers ON controllers.id = position_status.controller_id
+            LEFT JOIN controllers AS trainee ON trainee.id = position_status.trainee_controller_id
+            GROUP BY position_id
+            `, {
+            $log_date: log_date,
+            $controller_id: controller_id,
+        }
+        )
+        let position_status = AsObject<LogTimes & {
+            controller_initials: string
+            trainee_initials: string
+        }>(result).filter(row => (row.controller_id == controller_id || row.trainee_controller_id === controller_id))
+
+        let position_ids = position_status.map(row => row.position_id)
+
+        let combination_center = AsObject<{position_id: number}>(db.exec(
+            `
+            SELECT
+                position_id
+            FROM 
+                combined_center
+            where 
+                log_date=$log_date
+            `, {
+            $log_date: log_date
+        })).map(row => row.position_id)
+        let t_position_id = 0
+        if(position_ids.length === 1){
+            t_position_id = position_ids[0]
+        } else {
+            t_position_id = position_ids.filter(position_id => combination_center.includes(position_id))[0]
+        }
+        let position_pos = AsObject<{position: number}>(db.exec(
+            `
+            SELECT
+                position
+            FROM 
+                positions
+            where 
+                id=$id
+            `, {
+            $id: t_position_id
+        }))[0].position
+        return position_pos
+    }
+
     static async GetAllPositionsStatus(log_date: string, until_time?: number) {
         const db = await Open()
 
@@ -182,6 +245,7 @@ class LogTimes {
             trainee_initials: string
         }>(result)
     }
+
     static async GetAllPositionsStatusValues(log_date: string, until_time?: number) {
         // console.log('log_date:', log_date, " until_time:", until_time)
         const db = await Open()
@@ -333,8 +397,8 @@ class LogTimes {
 
                 writeString += nextLine + 'Saved at, ' + new Date().toString()
 
-                fs.writeFileSync(filename, writeString) 
-                resObj.success = true 
+                fs.writeFileSync(filename, writeString)
+                resObj.success = true
                 return resObj
             }
         } catch (err) {
