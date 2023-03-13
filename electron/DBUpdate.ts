@@ -1,12 +1,12 @@
-import { Close, Open } from "./Models/Core"
+import { Close, Open } from "./Models/Core";
 
 const DBUpdate = async () => {
-    const db = await Open()
-    try {
-        db.exec("SELECT * FROM combined_center")
-        console.log("'combined_center' already exists")
-    } catch (error) {
-        db.run(`
+	const db = await Open();
+	try {
+		db.exec("SELECT * FROM combined_center");
+		console.log("'combined_center' already exists");
+	} catch (error) {
+		db.run(`
         CREATE TABLE combined_center (
             id INTEGER NOT NULL,
             position_id INTEGER CHECK ( position_id > 0 ) NOT NULL,
@@ -14,32 +14,43 @@ const DBUpdate = async () => {
             PRIMARY KEY (id, log_date),
             UNIQUE (position_id)
         );
-        `)
-        console.log("'combined_center' created")
-    }
-    try {
-        db.exec("SELECT  time_since_lastin FROM bullpen")
-        console.log("'time_since_lastin' already exists")
-    } catch (error) {
-        db.run(`
+        `);
+		console.log("'combined_center' created");
+	}
+	try {
+		db.exec("SELECT  time_since_lastin FROM bullpen");
+		console.log("'time_since_lastin' already exists");
+	} catch (error) {
+		db.run(`
             ALTER TABLE bullpen ADD time_since_lastin TEXT DEFAULT '0';
-        `)
-        console.log("'combined_center' created")
-    }
+        `);
+		console.log("'combined_center' created");
+	}
 
-    try {
-        db.exec(`CREATE TABLE IF NOT EXISTS tbl_pos_combined_integration  (
+	try {
+		db.exec(`CREATE TABLE IF NOT EXISTS tbl_pos_combined_integration  (
             id int(0) NOT NULL,
             center_id int(0) NULL,
             combined_id int(0) NULL,
             log_date date NULL,
             PRIMARY KEY (id, center_id, combined_id, log_date)
-          )`)
-    } catch (err) {
-        console.log('new tbl_pos_combined_integration creation error')
-    }
-    Close(db, true)
+          )`);
+	} catch (err) {
+		console.log("new tbl_pos_combined_integration creation error");
+	}
 
-}
+	// Insert appsettings table for isdaylight
+	try {
+		db.exec(`CREATE TABLE  IF NOT EXISTS appsetting (
+            id int(0) NOT NULL,
+            isdaylight integer UNIQUE NOT NULL DEFAULT 0,
+            PRIMARY KEY (id)
+        )`);
+	} catch (err) {
+		console.log("new appsettings creation error");
+	}
 
-export default DBUpdate
+	Close(db, true);
+};
+
+export default DBUpdate;

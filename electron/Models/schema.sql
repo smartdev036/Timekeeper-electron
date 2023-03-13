@@ -77,3 +77,9 @@ CREATE TABLE IF NOT EXISTS tbl_pos_combined_integration  (
   log_date date NULL,
   PRIMARY KEY (id, center_id, combined_id, log_date)
 )
+
+CREATE TABLE  IF NOT EXISTS appsetting (
+    id int(0) NOT NULL,
+    isdaylight integer UNIQUE NOT NULL DEFAULT 0,
+    PRIMARY KEY (id)
+)
