@@ -6,17 +6,24 @@ import Popup from "../../reusable/components/Popup";
 import CopyText from "../../reusable/components/CopyText";
 import AsyncErrorCatcher from "../../reusable/utils/AsyncErrorCatcher";
 import { Box, Switch, Typography } from "@mui/material";
+import { useAppSetting } from "../../context/AppSettingProvider";
 
 const Settings = () => {
 	const [uploading, setUploading] = useState(false);
 	const [uploadLink, setUploadLink] = useState("");
-	const [isDaylight, setIsDaylight] = useState(false);
 	const PopupOpenState = useState(false);
+
+	const { appsetting, dispatch } = useAppSetting();
+	const { isdaylight } = appsetting;
+
+	const updateDaylightSetting = (result: number) => {
+		dispatch({ type: "daylight", payload: { isdaylight: result } });
+	};
 
 	useEffect(() => {
 		(async () => {
 			let response = await DB.Appsetting.GetDaylight();
-			setIsDaylight(response.result ? true : false);
+			updateDaylightSetting(response.result);
 		})();
 	}, []);
 
@@ -25,7 +32,7 @@ const Settings = () => {
 	) => {
 		let isdaylight = event.target.checked ? 1 : 0;
 		let response = await DB.Appsetting.UpdateIsDaylight(isdaylight);
-		setIsDaylight(response.result ? true : false);
+		updateDaylightSetting(response.result);
 	};
 
 	return (
@@ -54,12 +61,12 @@ const Settings = () => {
 			</Popup>
 			<Box sx={{ display: "flex", alignItems: "center" }}>
 				<Switch
-					checked={isDaylight}
+					checked={isdaylight}
 					onChange={handleDaylightChange}
 					inputProps={{ "aria-label": "Controlled" }}
 				/>
 				<Typography variant="h6" component="h2">
-					Turn {isDaylight ? "on" : "off"} Daylight timezone
+					Turn {isdaylight ? "on" : "off"} Daylight timezone
 				</Typography>
 			</Box>
 		</>
