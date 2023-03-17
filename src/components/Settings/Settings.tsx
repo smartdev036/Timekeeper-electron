@@ -13,27 +13,27 @@ const Settings = () => {
 	const [uploadLink, setUploadLink] = useState("");
 	const PopupOpenState = useState(false);
 
-	const { appsetting, dispatch } = useAppSetting();
-	const { isdaylight } = appsetting;
+	// const { appsetting, dispatch } = useAppSetting();
+	// const { isdaylight } = appsetting;
 
-	const updateDaylightSetting = (result: number) => {
-		dispatch({ type: "daylight", payload: { isdaylight: result } });
-	};
+	// const updateDaylightSetting = (result: number) => {
+	// 	dispatch({ type: "daylight", payload: { isdaylight: result } });
+	// };
 
-	useEffect(() => {
-		(async () => {
-			let response = await DB.Appsetting.GetDaylight();
-			updateDaylightSetting(response.result);
-		})();
-	}, []);
+	// useEffect(() => {
+	// 	(async () => {
+	// 		let response = await DB.Appsetting.GetDaylight();
+	// 		updateDaylightSetting(response.result);
+	// 	})();
+	// }, []);
 
-	const handleDaylightChange = async (
-		event: React.ChangeEvent<HTMLInputElement>
-	) => {
-		let isdaylight = event.target.checked ? 1 : 0;
-		let response = await DB.Appsetting.UpdateIsDaylight(isdaylight);
-		updateDaylightSetting(response.result);
-	};
+	// const handleDaylightChange = async (
+	// 	event: React.ChangeEvent<HTMLInputElement>
+	// ) => {
+	// 	let isdaylight = event.target.checked ? 1 : 0;
+	// 	let response = await DB.Appsetting.UpdateIsDaylight(isdaylight);
+	// 	updateDaylightSetting(response.result);
+	// };
 
 	return (
 		<>
@@ -59,7 +59,7 @@ const Settings = () => {
 			<Popup trigger={<div></div>} state={PopupOpenState}>
 				<CopyText text={uploadLink} />
 			</Popup>
-			<Box sx={{ display: "flex", alignItems: "center" }}>
+			{/* <Box sx={{ display: "flex", alignItems: "center" }}>
 				<Switch
 					checked={isdaylight}
 					onChange={handleDaylightChange}
@@ -68,7 +68,7 @@ const Settings = () => {
 				<Typography variant="h6" component="h2">
 					Turn {isdaylight ? "on" : "off"} Daylight timezone
 				</Typography>
-			</Box>
+			</Box> */}
 		</>
 	);
 };

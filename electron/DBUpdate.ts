@@ -39,17 +39,6 @@ const DBUpdate = async () => {
 		console.log("new tbl_pos_combined_integration creation error");
 	}
 
-	// Insert appsettings table for isdaylight
-	try {
-		db.exec(`CREATE TABLE  IF NOT EXISTS appsetting (
-            id int(0) NOT NULL,
-            isdaylight integer UNIQUE NOT NULL DEFAULT 0,
-            PRIMARY KEY (id)
-        )`);
-	} catch (err) {
-		console.log("new appsettings creation error");
-	}
-
 	Close(db, true);
 };
 
