@@ -7,7 +7,6 @@ import useReRender from "../../reusable/hooks/useReRender";
 import LocalDate from "../../reusable/LocalDate";
 import LocalTime from "../../reusable/LocalTime";
 import AsyncErrorCatcher from "../../reusable/utils/AsyncErrorCatcher";
-import { convertSecondUnitByMinute } from "../../reusable/utils/convertSecondUnit";
 import CombinePopup from "./CombinePopup";
 import ControllerInput from "./ControllerInput";
 import styles from "./PositionPopupInner.module.scss";
@@ -20,7 +19,6 @@ interface OptionType {
 
 interface PositionPopupInnerProps {
   date: LocalDate;
-  time?: LocalTime;
   position: Positions;
   combined?: string;
   status?: LogTimes & {
@@ -35,7 +33,6 @@ const PositionPopupInner = ({
   closePopup,
   date,
   status,
-  time,
   ...props
 }: PositionPopupInnerProps) => {
   const isDateToday = date.toSerialized() === new LocalDate().toSerialized();
@@ -44,7 +41,7 @@ const PositionPopupInner = ({
   // }
 
   const State = {
-    time: useState<LocalTime | null>(time ?? null),
+    time: useState<LocalTime | null>(new LocalTime()),
     controller: useState<OptionType | null>(null),
     trainee: useState<OptionType | null>(null),
   };
@@ -230,7 +227,6 @@ const PositionPopupInner = ({
             state={State.time}
             shouldDisableFuture={isDateToday}
             setError={TimeErrorState[1]}
-            disabled
           />
           <ControllerInput
             label="Controller"

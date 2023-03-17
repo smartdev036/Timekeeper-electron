@@ -13,7 +13,6 @@ interface StateTimePickerProps {
   state?: StateType<LocalTime | null>
   required?: boolean
   shouldDisableFuture?: boolean
-  disabled?: boolean
 
   setError?: React.Dispatch<React.SetStateAction<string | null>>
 }
@@ -112,7 +111,6 @@ const StateTimePicker = (props: StateTimePickerProps) => {
             />
           )
         }}
-        disabled={props.disabled}
       />
     </div>
   )

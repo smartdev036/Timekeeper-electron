@@ -18,7 +18,6 @@ declare class LogTimes {
         log_date: string;
         start_time: number;
     }): Promise<void>;
-    static GetPositionByControllerId(controller_id: number, log_date: string, until_time?: number): Promise<number>;
     static GetAllPositionsStatus(log_date: string, until_time?: number): Promise<(LogTimes & {
         controller_initials: string;
         trainee_initials: string;

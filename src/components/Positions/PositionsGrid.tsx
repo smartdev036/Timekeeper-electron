@@ -5,6 +5,7 @@ import Popup from "../../reusable/components/Popup";
 import useAsyncRefresh from "../../reusable/hooks/useAsyncRefresh";
 import DB from "../../DB";
 import { LogTimes, Positions } from "../../db-typings/electron/Models";
+import PositionPopupInner from "./PositionPopupInner";
 import PositionBoxSkeleton from "./PositionBoxSkeleton";
 import useReRender from "../../reusable/hooks/useReRender";
 import clsx from "clsx";
@@ -15,9 +16,6 @@ import PositionGridSkeleton from "./PositionGridSkeleton";
 import LocalTime from "../../reusable/LocalTime";
 import OffCanvasMenu from "../Bullpen/OffCanvasMenu";
 import BullPenSide from "../Bullpen/BullpenSide";
-
-import PositionPopupInner from "./PositionPopupInner";
-import PositionPopupAssignedInner from "./PositionPopupAssignedInner";
 
 interface PositionBoxProps {
   date: LocalDate;
@@ -167,8 +165,7 @@ const PositionBox = ({ position, status, ...props }: PositionBoxProps) => {
       }
     >
       {position && (
-        // <PositionPopupInner
-        <PositionPopupAssignedInner
+        <PositionPopupInner
           date={props.date}
           position={position}
           status={status}
