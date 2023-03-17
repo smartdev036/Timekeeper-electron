@@ -39,6 +39,14 @@ const DBUpdate = async () => {
 		console.log("new tbl_pos_combined_integration creation error");
 	}
 
+	try {
+		db.exec(`
+			ALTER TABLE log_times ADD start_minute INTEGER DEFAULT 0
+			`);
+	} catch (err) {
+		console.log("new tbl_pos_combined_integration creation error");
+	}
+
 	Close(db, true);
 };
 

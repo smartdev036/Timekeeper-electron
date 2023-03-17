@@ -32,3 +32,5 @@ master.zip
 electron/settings.ts
 
 **/*.d.ts
+
+electron/Models/schema.ts

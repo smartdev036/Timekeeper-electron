@@ -47,6 +47,7 @@ CREATE TABLE log_times (
     trainee_controller_id INTEGER NOT NULL,
     log_date TEXT NOT NULL,
     start_time INTEGER NOT NULL,
+    start_minute INTEGER NOT NULL,
     PRIMARY KEY (position_id, log_date, start_time)
 );
 
