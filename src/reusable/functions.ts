@@ -27,10 +27,10 @@ export const fromSerializedTime = (
 
 	const d = new Date();
 	if (toNormalTime) {
-		d.setFullYear(2000, 0, 1);
+		// d.setFullYear(2000, 0, 1);
 		d.setHours(hours, minutes, seconds);
 	} else {
-		d.setUTCFullYear(2000, 0, 1);
+		// d.setUTCFullYear(2000, 0, 1);
 		d.setUTCHours(hours, minutes, seconds);
 	}
 

@@ -53,7 +53,7 @@ class LocalTime {
 
 	static convertFromUTC(utcTime: UTCTime) {
 		const d = new Date();
-		d.setUTCFullYear(2000, 1, 1);
+		// d.setUTCFullYear(2000, 1, 1);
 		d.setUTCHours(utcTime.hour, utcTime.minute, utcTime.second);
 
 		return new LocalTime({
@@ -65,7 +65,7 @@ class LocalTime {
 
 	convertToUTC() {
 		const d = new Date();
-		d.setFullYear(2000, 1, 1);
+		// d.setFullYear(2000, 1, 1);
 		d.setHours(this.hour, this.minute, this.second);
 		return new UTCTime({
 			hour: d.getUTCHours(),
