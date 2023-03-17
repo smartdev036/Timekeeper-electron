@@ -30,3 +30,5 @@ yarn-error.log*
 master.zip
 
 electron/settings.ts
+
+**/*.d.ts
