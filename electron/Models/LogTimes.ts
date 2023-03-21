@@ -124,7 +124,7 @@ class LogTimes {
 			`UPDATE log_times SET
                 controller_id = $controller_id,
                 trainee_controller_id = $trainee_controller_id,
-                start_time = $start_time
+                start_time = $start_time,
                 start_minute = $start_minute
             WHERE position_id = $prev_position_id
             AND log_date = $prev_log_date

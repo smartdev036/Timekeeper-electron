@@ -297,7 +297,7 @@ class PositionCombinations {
                 ; (db.run(`
                     INSERT INTO log_times
                     SELECT * FROM (
-                        SELECT $position_A, controller_id, trainee_controller_id, log_date, $start_time AS st
+                        SELECT $position_A, controller_id, trainee_controller_id, log_date, $start_time, start_minute
                         FROM log_times
                         WHERE log_date = $log_date
                         AND position_id = $position_B
@@ -374,7 +374,7 @@ class PositionCombinations {
                         ; (db.run(`
                             INSERT INTO log_times
                             SELECT * FROM (
-                                SELECT $position_to_be_updated, controller_id, trainee_controller_id, log_date, $start_time AS st
+                                SELECT $position_to_be_updated, controller_id, trainee_controller_id, log_date, $start_time, start_minute
                                 FROM log_times
                                 WHERE log_date = $log_date
                                 AND position_id = $position_B
@@ -429,7 +429,7 @@ class PositionCombinations {
                         ; (db.run(`
                         INSERT INTO log_times
                         SELECT * FROM (
-                            SELECT $position_A, controller_id, trainee_controller_id, log_date, $start_time AS st
+                            SELECT $position_A, controller_id, trainee_controller_id, log_date, $start_time, start_minute
                             FROM log_times
                             WHERE log_date = $log_date
                             AND position_id = $position_B
@@ -493,7 +493,7 @@ class PositionCombinations {
                         ; (db.run(`
                             INSERT INTO log_times
                             SELECT * FROM (
-                                SELECT $position_to_be_updated, controller_id, trainee_controller_id, log_date, $start_time AS st
+                                SELECT $position_to_be_updated, controller_id, trainee_controller_id, log_date, $start_time, start_minute
                                 FROM log_times
                                 WHERE log_date = $log_date
                                 AND position_id = $position_B
