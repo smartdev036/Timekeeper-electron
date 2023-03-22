@@ -7,20 +7,24 @@ import useReRender from "../../reusable/hooks/useReRender";
 import LocalDate from "../../reusable/LocalDate";
 import LocalTime from "../../reusable/LocalTime";
 import AsyncErrorCatcher from "../../reusable/utils/AsyncErrorCatcher";
-import { convertSecondUnitByMinute } from "../../reusable/utils/convertSecondUnit";
 import CombinePopup from "./CombinePopup";
 import ControllerInput from "./ControllerInput";
-import styles from "./PositionPopupInner.module.scss";
+import ControllerAssignedInput from "./ControllerAssignedInput";
+import styles from "./PositionPopupAssignedInner.module.scss";
 import StateTimePicker from "./TimePicker";
+import PositionPopupInner from "./PositionPopupInner";
+import Popup from "../../reusable/components/Popup";
+import useAsyncRefresh from "../../reusable/hooks/useAsyncRefresh";
+import { convertSecondUnitByMinute } from "../../reusable/utils/convertSecondUnit";
 
 interface OptionType {
   label: string;
   id: number;
+  group?: string;
 }
 
-interface PositionPopupInnerProps {
+interface PositionPopupAssignedInnerProps {
   date: LocalDate;
-  time?: LocalTime;
   position: Positions;
   combined?: string;
   status?: LogTimes & {
@@ -30,34 +34,71 @@ interface PositionPopupInnerProps {
   closePopup: () => void;
 }
 
-const PositionPopupInner = ({
+const PositionPopupAssignedInner = ({
   position,
   closePopup,
   date,
   status,
-  time,
   ...props
-}: PositionPopupInnerProps) => {
+}: PositionPopupAssignedInnerProps) => {
+
+  const { ReRender, counter } = useReRender();
+  const PopupInnerOpenState = useState(false);
+
   const isDateToday = date.toSerialized() === new LocalDate().toSerialized();
   // if (!isDateToday) {
   //     initalTime.setHours(23, 59, 59)
   // }
 
   const State = {
-    time: useState<LocalTime | null>(time ?? null),
+    time: useState<LocalTime | null>(new LocalTime()),
     controller: useState<OptionType | null>(null),
     trainee: useState<OptionType | null>(null),
   };
 
+
+  const { value: positions_value } = useAsyncRefresh(
+    () => DB.Positions.GetAll(date.toSerialized()),
+    [DB, date, counter]
+  );
+
+  // Position Map
+  const positionMap = Object.fromEntries(
+    positions_value?.result.map((position) => [position.position, position]) ??
+    []
+  );
+
+  const [new_position, setNewPosition] = useState(position)
+
+  // useEffect(() => {
+  //   (async () =>
+  //     console.log('useEffect: ', await (await DB.PositionCombinations.TestDBCall(new LocalDate().toSerialized(), position.id)).result)
+  //   )()
+  // }, [])
+
   useEffect(() => {
-    (async() =>
-    console.log('useEffect: ', await (await DB.PositionCombinations.TestDBCall(new LocalDate().toSerialized(), position.id)).result)
-    )()
-  }, [])
+    (async () => {
+      // console.log('State.controller: ', State.controller[0])
+      if (State.controller[0]?.group === 'Assigned Controllers') {
+        // console.log("t_position_id start")
+        let t_position_id = (await DB.LogTimes.GetPositionByControllerId(State.controller[0]?.id ?? 0, date.toSerialized())).result
+        if (t_position_id === position.position) {
+          ElectronAlert('You are already on that posiiton!')
+          return
+        }
+        if ((await ElectronConfirm('Do you want to exchange this position?'))) {
+          // console.log("t_position_id ", t_position_id)
+          setNewPosition(positionMap[t_position_id])
+          PopupInnerOpenState[1](true)
+        }
+      } else {
+        PopupInnerOpenState[1](false)
+      }
+    })()
+  }, [State.controller[0]])
 
   const TimeErrorState = useState<string | null>(null);
 
-  const { ReRender } = useReRender();
   const ConfirmFutureTime = async (
     type: "closing" | "adding",
     time: LocalTime
@@ -92,6 +133,7 @@ const PositionPopupInner = ({
   };
 
   const HandleAdd = WrapPositionAdding(async () => {
+    console.log("state.time: ", State.time[0])
 
     if (State.time[0] === null) return;
     if (State.controller[0] === null) return;
@@ -145,7 +187,7 @@ const PositionPopupInner = ({
     }
     // DB.Bullpen.UpdateTimeSinceInActive(Number(State?.trainee[0]?.id), "0");
 
-    await DB.PositionCombinations.insert_tbl_pos(position.id , position.id, date.toSerialized())
+    await DB.PositionCombinations.insert_tbl_pos(position.id, position.id, date.toSerialized())
     await HandleDecombine()
 
     await DB.LogTimes.Add({
@@ -191,7 +233,7 @@ const PositionPopupInner = ({
       }
     }
 
-    await DB.PositionCombinations.insert_tbl_pos(position.id , position.id, date.toSerialized())
+    await DB.PositionCombinations.insert_tbl_pos(position.id, position.id, date.toSerialized())
     await HandleDecombine()
 
     await DB.LogTimes.Close({
@@ -203,11 +245,12 @@ const PositionPopupInner = ({
     ReRender();
   });
 
-  const HandleDecombine = async() => {
-    if(props.combined){
+  const HandleDecombine = async () => {
+    if (props.combined) {
       await DB.PositionCombinations.Decombine(position.id, date.toSerialized());
     }
   };
+
 
   return (
     <Container className={styles.PopupInner} noMargin={true}>
@@ -230,9 +273,8 @@ const PositionPopupInner = ({
             state={State.time}
             shouldDisableFuture={isDateToday}
             setError={TimeErrorState[1]}
-            disabled
           />
-          <ControllerInput
+          <ControllerAssignedInput
             label="Controller"
             state={State.controller}
             required
@@ -267,14 +309,32 @@ const PositionPopupInner = ({
               date={date}
               trainee_controller_id={status?.trainee_controller_id}
               controller_id={status?.controller_id}
-              start_time={State.time[0]?.toSerialized() ?? new LocalTime().toSerialized()} 
+              start_time={State.time[0]?.toSerialized() ?? new LocalTime().toSerialized()}
             />
             <Button label="Closed" width="100%" onClick={HandleClose} />
           </Container>
         </Container>
+        <Popup
+          small
+          state={PopupInnerOpenState}
+          trigger={
+            <></>
+          }
+        >
+          {new_position && (
+            <PositionPopupInner
+              date={date}
+              time={State.time[0] ?? new LocalTime()}
+              position={new_position}
+              status={status}
+              combined={props.combined}
+              closePopup={() => PopupInnerOpenState[1](false)}
+            />
+          )}
+        </Popup>
       </Fragment>
     </Container>
   );
 };
 
-export default PositionPopupInner;
+export default PositionPopupAssignedInner;
