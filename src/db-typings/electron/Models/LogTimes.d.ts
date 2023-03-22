@@ -10,14 +10,14 @@ interface LogTimes {
 export declare type ReportTypes = "protime" | "trainer";
 declare class LogTimes {
     private static RemoveCombinationsIfEmpty;
-    static Add(log_time: LogTimes, isClosing?: boolean): Promise<void>;
+    static Add(log_time: LogTimes, isClosing?: boolean): Promise<string[]>;
     static Update(prev_log_time: LogTimes, log_time: LogTimes, canDelete?: boolean): Promise<void>;
     static Delete(position_id: number, log_date: string, start_time: number): Promise<void>;
     static Close(log_time: {
         position_id: number;
         log_date: string;
         start_time: number;
-    }): Promise<void>;
+    }): Promise<string[]>;
     static GetPositionByControllerId(controller_id: number, log_date: string, until_time?: number): Promise<number>;
     static GetAllPositionsStatus(log_date: string, until_time?: number): Promise<(LogTimes & {
         controller_initials: string;

@@ -211,7 +211,8 @@ const PositionPopupAssignedInner = ({
 			date.toSerialized()
 		);
 		await HandleDecombine();
-		console.log("handleDecombine", {
+
+		const res = await DB.LogTimes.Add({
 			position_id: position.id,
 			controller_id: State.controller[0].id,
 			trainee_controller_id: State.trainee[0]?.id ?? 0,
@@ -219,13 +220,13 @@ const PositionPopupAssignedInner = ({
 			start_time: State.time[0].toSerialized(),
 		});
 
-		await DB.LogTimes.Add({
-			position_id: position.id,
-			controller_id: State.controller[0].id,
-			trainee_controller_id: State.trainee[0]?.id ?? 0,
-			log_date: date.toSerialized(),
-			start_time: State.time[0].toSerialized(),
-		});
+		if (res.result.length > 0) {
+			ElectronAlert(
+				`${res.result.join(
+					", "
+				)} , positions are already assigned at that time, please check again at validation!`
+			);
+		}
 
 		closePopup();
 		ReRender();

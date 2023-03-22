@@ -82,6 +82,9 @@ class LogTimes {
 		        `
 		);
 
+		const assignedPositions: number[] = [];
+		console.log("assigned: ", positions_associated, log_time);
+
 		if (positions_associated.length === 0) {
 			try {
 				stmnt.run({
@@ -93,6 +96,7 @@ class LogTimes {
 					$start_minute: convertSecondToMinute(log_time.start_time),
 				});
 			} catch (err) {
+				assignedPositions.push(log_time.position_id);
 				console.log("err LogTime: Add-one: ", err, {
 					$position_id: log_time.position_id,
 					$controller_id: log_time.controller_id,
@@ -115,6 +119,7 @@ class LogTimes {
 					$start_minute: convertSecondToMinute(log_time.start_time),
 				});
 			} catch (err) {
+				assignedPositions.push(position_id);
 				console.log("err: LogTime: Add-multi: ", err, {
 					$position_id: position_id,
 					$controller_id: log_time.controller_id,
@@ -128,6 +133,11 @@ class LogTimes {
 		stmnt.free();
 
 		Close(db, true);
+
+		const assignedPositionNames = (await Positions.GetAll())
+			.filter((pos) => assignedPositions.includes(pos.id))
+			.map((pos) => pos.shorthand);
+		return assignedPositionNames;
 	}
 
 	static async Update(
