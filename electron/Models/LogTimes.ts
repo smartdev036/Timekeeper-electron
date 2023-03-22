@@ -76,32 +76,54 @@ class LogTimes {
 
 		const stmnt = db.prepare(
 			`INSERT INTO log_times
-                (position_id, controller_id, trainee_controller_id, log_date, start_time, start_minute)
-            VALUES
-                ($position_id, $controller_id, $trainee_controller_id, $log_date, $start_time, $start_minute)
-            `
+		            (position_id, controller_id, trainee_controller_id, log_date, start_time, start_minute)
+		        VALUES
+		            ($position_id, $controller_id, $trainee_controller_id, $log_date, $start_time, $start_minute)
+		        `
 		);
 
 		if (positions_associated.length === 0) {
-			stmnt.run({
-				$position_id: log_time.position_id,
-				$controller_id: log_time.controller_id,
-				$trainee_controller_id: log_time.trainee_controller_id,
-				$log_date: log_time.log_date,
-				$start_time: log_time.start_time,
-				$start_minute: convertSecondToMinute(log_time.start_time),
-			});
+			try {
+				stmnt.run({
+					$position_id: log_time.position_id,
+					$controller_id: log_time.controller_id,
+					$trainee_controller_id: log_time.trainee_controller_id,
+					$log_date: log_time.log_date,
+					$start_time: log_time.start_time,
+					$start_minute: convertSecondToMinute(log_time.start_time),
+				});
+			} catch (err) {
+				console.log("err LogTime: Add-one: ", err, {
+					$position_id: log_time.position_id,
+					$controller_id: log_time.controller_id,
+					$trainee_controller_id: log_time.trainee_controller_id,
+					$log_date: log_time.log_date,
+					$start_time: log_time.start_time,
+					$start_minute: convertSecondToMinute(log_time.start_time),
+				});
+			}
 		}
 
 		for (const { position_id } of positions_associated) {
-			stmnt.run({
-				$position_id: position_id,
-				$controller_id: log_time.controller_id,
-				$trainee_controller_id: log_time.trainee_controller_id,
-				$log_date: log_time.log_date,
-				$start_time: log_time.start_time,
-				$start_minute: convertSecondToMinute(log_time.start_time),
-			});
+			try {
+				stmnt.run({
+					$position_id: position_id,
+					$controller_id: log_time.controller_id,
+					$trainee_controller_id: log_time.trainee_controller_id,
+					$log_date: log_time.log_date,
+					$start_time: log_time.start_time,
+					$start_minute: convertSecondToMinute(log_time.start_time),
+				});
+			} catch (err) {
+				console.log("err: LogTime: Add-multi: ", err, {
+					$position_id: position_id,
+					$controller_id: log_time.controller_id,
+					$trainee_controller_id: log_time.trainee_controller_id,
+					$log_date: log_time.log_date,
+					$start_time: log_time.start_time,
+					$start_minute: convertSecondToMinute(log_time.start_time),
+				});
+			}
 		}
 		stmnt.free();
 
