@@ -1,5 +1,5 @@
 import { Database } from "sql.js";
-import { PositionCombinations, Positions } from ".";
+import { LogValidation, PositionCombinations, Positions } from ".";
 import { Close, Open } from "./Core";
 import { AsObject, assert } from "./Helpers";
 import * as fs from "fs";
@@ -56,6 +56,9 @@ class LogTimes {
 
 		const db = await Open();
 
+		// Remove Validation if exist
+		LogValidation.Delete(log_time.position_id, log_time.log_date)
+
 		const positions_associated = AsObject<PositionCombinations>(
 			db.exec(
 				`
@@ -83,7 +86,7 @@ class LogTimes {
 		);
 
 		const assignedPositions: number[] = [];
-		console.log("assigned: ", positions_associated, log_time);
+		// console.log("assigned: ", positions_associated, log_time);
 
 		if (positions_associated.length === 0) {
 			try {
@@ -97,14 +100,14 @@ class LogTimes {
 				});
 			} catch (err) {
 				assignedPositions.push(log_time.position_id);
-				console.log("err LogTime: Add-one: ", err, {
-					$position_id: log_time.position_id,
-					$controller_id: log_time.controller_id,
-					$trainee_controller_id: log_time.trainee_controller_id,
-					$log_date: log_time.log_date,
-					$start_time: log_time.start_time,
-					$start_minute: convertSecondToMinute(log_time.start_time),
-				});
+				// console.log("err LogTime: Add-one: ", err, {
+				// 	$position_id: log_time.position_id,
+				// 	$controller_id: log_time.controller_id,
+				// 	$trainee_controller_id: log_time.trainee_controller_id,
+				// 	$log_date: log_time.log_date,
+				// 	$start_time: log_time.start_time,
+				// 	$start_minute: convertSecondToMinute(log_time.start_time),
+				// });
 			}
 		}
 
@@ -120,14 +123,14 @@ class LogTimes {
 				});
 			} catch (err) {
 				assignedPositions.push(position_id);
-				console.log("err: LogTime: Add-multi: ", err, {
-					$position_id: position_id,
-					$controller_id: log_time.controller_id,
-					$trainee_controller_id: log_time.trainee_controller_id,
-					$log_date: log_time.log_date,
-					$start_time: log_time.start_time,
-					$start_minute: convertSecondToMinute(log_time.start_time),
-				});
+				// console.log("err: LogTime: Add-multi: ", err, {
+				// 	$position_id: position_id,
+				// 	$controller_id: log_time.controller_id,
+				// 	$trainee_controller_id: log_time.trainee_controller_id,
+				// 	$log_date: log_time.log_date,
+				// 	$start_time: log_time.start_time,
+				// 	$start_minute: convertSecondToMinute(log_time.start_time),
+				// });
 			}
 		}
 		stmnt.free();
@@ -151,6 +154,10 @@ class LogTimes {
 		}
 
 		const db = await Open();
+
+		// Remove Validation if exist
+		LogValidation.Delete(log_time.position_id, log_time.log_date)
+
 
 		const rows = db.run(
 			`UPDATE log_times SET
@@ -182,6 +189,9 @@ class LogTimes {
 		start_time: number
 	) {
 		const db = await Open();
+
+		// Remove Validation if exist
+		LogValidation.Delete(position_id, log_date)
 
 		db.run(
 			`

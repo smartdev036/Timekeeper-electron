@@ -13,6 +13,20 @@ class LogValidation {
         assert(position_id !== 0)
        
         const db = await Open()
+
+        // Validating abs(start_minute-start_time) < 60
+        db.run(
+            `
+            UPDATE log_times 
+                SET start_minute = Floor(start_time/60)*60 
+            where 
+                log_date=$log_date and position_id=$position_id;
+            `, {
+                $position_id: position_id,
+                $log_date: log_date,
+            }
+        )
+        // After validation abs(start_minute-start_time) < 60
         db.run(
             `INSERT INTO log_validation
                 (position_id, log_date, timestamp)
@@ -22,6 +36,24 @@ class LogValidation {
                 $position_id: position_id,
                 $log_date: log_date,
                 $timestamp: Math.floor(Date.now()/1000),
+            }
+        )
+        Close(db, true)
+    }
+
+    static async Delete(position_id: number, log_date: string) {
+        assert(position_id !== 0)
+       
+        const db = await Open()
+
+        // After validation abs(start_minute-start_time) < 60
+        db.run(
+            `DELETE FROM log_validation
+            WHERE
+                position_id = $position_id and log_date = $log_date
+            `, {
+                $position_id: position_id,
+                $log_date: log_date,
             }
         )
         Close(db, true)
