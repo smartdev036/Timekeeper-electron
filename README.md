@@ -6,4 +6,7 @@
 2. Run `npm run electron:dev` for development
 3. Run `npm run electron:build` to build a production version
 
+
 Updated by https://github.com//smartdev036
+
+Updated at 2022-05-19
